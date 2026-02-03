@@ -1,0 +1,33 @@
+.terms-container {
+  padding: 16px;
+  max-height: 300px;
+  overflow-y: auto;
+  background: #fafaf8;
+  border: 1px solid #e0e0d8;
+  border-radius: 6px;
+  font-size: 12px;
+  line-height: 1.5;
+  color: #6a6a5f;
+}
+
+.terms-container h2 {
+  font-size: 16px;
+  font-weight: 500;
+  color: #4a4741;
+  margin-bottom: 12px;
+}
+
+.terms-container section {
+  margin-bottom: 12px;
+}
+
+.terms-container h3 {
+  font-size: 13px;
+  font-weight: 500;
+  color: #5a5a52;
+  margin-bottom: 6px;
+}
+
+.terms-container p {
+  margin: 0;
+}

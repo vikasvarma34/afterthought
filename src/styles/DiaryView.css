@@ -1,0 +1,262 @@
+.diary-view {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  background: #f5f5f0;
+  overflow: hidden;
+}
+
+.diary-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 14px 24px;
+  border-bottom: 1px solid #e0e0d8;
+  background: #fff;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.03);
+  justify-content: space-between;
+}
+
+.back-btn {
+  padding: 6px 10px;
+  background: transparent;
+  border: none;
+  color: #a8a89d;
+  cursor: pointer;
+  font-size: 14px;
+  transition: color 0.2s;
+}
+
+.back-btn:hover {
+  color: #4a4741;
+  background: transparent;
+}
+
+.diary-header h2 {
+  flex: 1;
+  font-size: 18px;
+  font-weight: 400;
+  color: #4a4741;
+  letter-spacing: -0.2px;
+}
+
+.header-actions {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+}
+
+.edit-btn {
+  padding: 6px 12px;
+  background: transparent;
+  border: none;
+  color: #7a6f6a;
+  cursor: pointer;
+  font-size: 13px;
+  transition: color 0.2s;
+}
+
+.edit-btn:hover {
+  color: #4a4741;
+  background: transparent;
+}
+
+.delete-btn {
+  padding: 6px 12px;
+  background: transparent;
+  border: none;
+  color: #c85a54;
+  cursor: pointer;
+  font-size: 13px;
+  transition: color 0.2s;
+}
+
+.delete-btn:hover {
+  color: #d87060;
+  background: transparent;
+}
+
+.entry-form {
+  padding: 16px;
+  border-bottom: 1px solid #e0e0d8;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  background: #fff;
+}
+
+.entry-form input,
+.entry-form textarea {
+  padding: 11px;
+  background: #fafaf8;
+  border: 1px solid #d8d8d0;
+  color: #4a4741;
+  border-radius: 6px;
+  font-size: 14px;
+  font-family: inherit;
+}
+
+.entry-form input {
+  min-height: auto;
+}
+
+.entry-form textarea {
+  flex: 1;
+  min-height: 100px;
+  max-height: 150px;
+  resize: vertical;
+}
+
+.entry-form input::placeholder,
+.entry-form textarea::placeholder {
+  color: #b8b8b0;
+}
+
+.entry-form button {
+  padding: 10px 16px;
+  background: #7a6f6a;
+  border: none;
+  color: #f5f5f0;
+  border-radius: 6px;
+  font-size: 13px;
+  align-self: flex-end;
+  font-weight: 500;
+}
+
+.entry-form button:hover:not(:disabled) {
+  background: #8a7f7a;
+}
+
+.edit-entry-form {
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  background: #fff;
+  flex: 1;
+  overflow-y: auto;
+}
+
+.edit-entry-form input,
+.edit-entry-form textarea {
+  padding: 11px;
+  background: #fafaf8;
+  border: 1px solid #d8d8d0;
+  color: #4a4741;
+  border-radius: 6px;
+  font-size: 14px;
+  font-family: inherit;
+}
+
+.edit-entry-form input {
+  min-height: auto;
+}
+
+.edit-entry-form textarea {
+  flex: 1;
+  min-height: 200px;
+  resize: vertical;
+}
+
+.edit-entry-form input::placeholder,
+.edit-entry-form textarea::placeholder {
+  color: #b8b8b0;
+}
+
+.form-actions {
+  display: flex;
+  gap: 8px;
+  justify-content: flex-end;
+}
+
+.form-actions button {
+  padding: 10px 16px;
+  background: #7a6f6a;
+  border: none;
+  color: #f5f5f0;
+  border-radius: 6px;
+  font-size: 13px;
+  cursor: pointer;
+  font-weight: 500;
+}
+
+.form-actions button:hover:not(:disabled) {
+  background: #8a7f7a;
+}
+
+.form-actions button.delete-btn {
+  background: transparent;
+  border: 1px solid #d8d8d0;
+  color: #c85a54;
+}
+
+.form-actions button.delete-btn:hover:not(:disabled) {
+  background: #fef5f4;
+  border-color: #e8d8d0;
+  color: #d87060;
+}
+
+.form-actions button.cancel-btn {
+  background: transparent;
+  border: 1px solid #d8d8d0;
+  color: #a8a89d;
+  padding: 10px 16px;
+}
+
+.form-actions button.cancel-btn:hover:not(:disabled) {
+  background: #fafaf8;
+  border-color: #d0d0c8;
+  color: #4a4741;
+}
+
+.entries {
+  flex: 1;
+  overflow-y: auto;
+  padding: 16px;
+  background: #f5f5f0;
+}
+
+.entry-item {
+  margin-bottom: 16px;
+  padding: 16px;
+  background: #fff;
+  border: 1px solid #e0e0d8;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+
+.entry-item:hover {
+  background: #fafaf8;
+  border-color: #d8d8d0;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.06);
+}
+
+.entry-item h3 {
+  font-size: 15px;
+  font-weight: 500;
+  color: #4a4741;
+  margin-bottom: 8px;
+}
+
+.entry-item .date {
+  font-size: 12px;
+  color: #a8a89d;
+  margin-bottom: 10px;
+}
+
+.entry-item .content {
+  font-size: 14px;
+  line-height: 1.6;
+  color: #6a6a5f;
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+
+.empty {
+  padding: 40px 16px;
+  text-align: center;
+  color: #a8a89d;
+  font-size: 13px;
+  line-height: 1.6;
+}
