@@ -360,7 +360,8 @@
 
   .settings-menu {
     min-width: 160px;
-    right: -40px;
+    right: 0;
+    max-width: 90vw;
   }
 
   .create-diary-modal {

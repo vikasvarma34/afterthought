@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { supabase } from '../lib/supabase';
 import DiaryList from '../components/DiaryList';
@@ -20,6 +20,7 @@ export default function Home() {
   const [creatingDiary, setCreatingDiary] = useState(false);
   const [showSettings, setShowSettings] = useState(false);
   const navigate = useNavigate();
+  const inactivityTimeoutRef = useRef(null);
 
   useEffect(() => {
     const checkAuth = async () => {
@@ -64,9 +65,39 @@ export default function Home() {
   };
 
   const handleLogout = async () => {
+    if (inactivityTimeoutRef.current) {
+      clearTimeout(inactivityTimeoutRef.current);
+    }
     await supabase.auth.signOut();
     navigate('/login');
   };
+
+  const resetInactivityTimer = () => {
+    if (inactivityTimeoutRef.current) {
+      clearTimeout(inactivityTimeoutRef.current);
+    }
+
+    inactivityTimeoutRef.current = setTimeout(() => {
+      console.log('User inactive for 30 minutes. Logging out...');
+      handleLogout();
+    }, 30 * 60 * 1000); // 30 minutes
+  };
+
+  useEffect(() => {
+    resetInactivityTimer();
+
+    const events = ['mousedown', 'keydown', 'scroll', 'touchstart', 'click'];
+    const handleActivity = () => resetInactivityTimer();
+
+    events.forEach((event) => document.addEventListener(event, handleActivity));
+
+    return () => {
+      events.forEach((event) => document.removeEventListener(event, handleActivity));
+      if (inactivityTimeoutRef.current) {
+        clearTimeout(inactivityTimeoutRef.current);
+      }
+    };
+  }, []);
 
   const handleCreateDiary = async (title) => {
     const { data, error } = await supabase
