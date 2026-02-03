@@ -143,7 +143,6 @@ export default function DiaryView({ diary, onBack, onDiaryDeleted, onDiaryUpdate
       alert('Failed to update diary: ' + error.message);
     } else {
       console.log('Diary updated successfully');
-      diary.title = diaryTitle;
       setEditingDiary(false);
       if (onDiaryUpdated) {
         onDiaryUpdated();
