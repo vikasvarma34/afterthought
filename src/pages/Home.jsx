@@ -5,6 +5,7 @@ import DiaryList from '../components/DiaryList';
 import DiaryView from '../components/DiaryView';
 import EmptyState from '../components/EmptyState';
 import Placeholder from '../components/Placeholder';
+import logo from '../assets/—Pngtree—black quill feather pen with_5157648.png';
 import '../styles/Home.css';
 import '../styles/EmptyState.css';
 import '../styles/Placeholder.css';
@@ -87,7 +88,7 @@ export default function Home() {
     <div className="home">
       <div className="header">
         <h1>
-          <img src="/src/assets/—Pngtree—black quill feather pen with_5157648.png" alt="afterThoughts" />
+          <img src={logo} alt="afterThoughts" />
           afterThoughts
         </h1>
         <button className="logout-btn" onClick={handleLogout}>

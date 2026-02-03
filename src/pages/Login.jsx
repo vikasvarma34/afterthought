@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { supabase } from '../lib/supabase';
 import TermsAndConditions from '../components/TermsAndConditions';
+import logo from '../assets/—Pngtree—black quill feather pen with_5157648.png';
 import '../styles/Auth.css';
 import '../styles/Terms.css';
 
@@ -69,7 +70,7 @@ export default function Login() {
     <div className="auth-container">
       <div className="auth-card">
         <div className="auth-logo">
-          <img src="/src/assets/—Pngtree—black quill feather pen with_5157648.png" alt="afterThoughts" />
+          <img src={logo} alt="afterThoughts" />
           <h1>afterThoughts</h1>
         </div>
         <form onSubmit={handleAuth}>
