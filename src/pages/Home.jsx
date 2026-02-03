@@ -134,18 +134,22 @@ export default function Home() {
       </div>
 
       <div className="content">
-        <DiaryList
-          diaries={diaries}
-          onSelectDiary={setSelectedDiary}
-          onCreateDiary={handleCreateDiary}
-        />
-        {selectedDiary ? (
-          <DiaryView
-            diary={selectedDiary}
-            onBack={() => setSelectedDiary(null)}
-            onDiaryDeleted={handleDiaryDeleted}
-            onDiaryUpdated={() => fetchDiaries(user.id)}
+        <div className="diary-list-container">
+          <DiaryList
+            diaries={diaries}
+            onSelectDiary={setSelectedDiary}
+            onCreateDiary={handleCreateDiary}
           />
+        </div>
+        {selectedDiary ? (
+          <div className="diary-view-container">
+            <DiaryView
+              diary={selectedDiary}
+              onBack={() => setSelectedDiary(null)}
+              onDiaryDeleted={handleDiaryDeleted}
+              onDiaryUpdated={() => fetchDiaries(user.id)}
+            />
+          </div>
         ) : diaries.length === 0 ? (
           <>
             <EmptyState

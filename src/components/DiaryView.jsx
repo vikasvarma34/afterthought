@@ -46,7 +46,7 @@ export default function DiaryView({ diary, onBack, onDiaryDeleted, onDiaryUpdate
 
   const handleAddEntry = async (e) => {
     e.preventDefault();
-    if (!content.trim()) return;
+    if (!title.trim() || !content.trim()) return;
     if (!diary?.uuid) {
       console.error('Cannot save entry: diary.uuid is missing!', diary);
       alert('Error: Diary ID is missing');
@@ -57,7 +57,7 @@ export default function DiaryView({ diary, onBack, onDiaryDeleted, onDiaryUpdate
     console.log('Adding entry with diary_id:', diary.uuid);
     const { data, error } = await supabase
       .from('entries')
-      .insert([{ diary_id: diary.uuid, title: title || null, content }])
+      .insert([{ diary_id: diary.uuid, title, content }])
       .select();
 
     if (error) {
@@ -80,12 +80,12 @@ export default function DiaryView({ diary, onBack, onDiaryDeleted, onDiaryUpdate
   };
 
   const handleSaveEntry = async () => {
-    if (!editContent.trim()) return;
+    if (!editTitle.trim() || !editContent.trim()) return;
 
     setSaving(true);
     const { error } = await supabase
       .from('entries')
-      .update({ title: editTitle || null, content: editContent })
+      .update({ title: editTitle, content: editContent })
       .eq('id', editingEntry.id);
 
     if (error) {
@@ -202,23 +202,24 @@ export default function DiaryView({ diary, onBack, onDiaryDeleted, onDiaryUpdate
           <form className="entry-form-modal">
             <input
               type="text"
-              placeholder="Entry title (optional)"
+              placeholder="Entry title"
               value={editTitle}
               onChange={(e) => setEditTitle(e.target.value)}
               disabled={saving}
+              required
+              autoFocus
             />
             <textarea
               placeholder="Entry content"
               value={editContent}
               onChange={(e) => setEditContent(e.target.value)}
               disabled={saving}
-              autoFocus
             />
             <div className="form-actions">
               <button 
                 type="button"
                 onClick={handleSaveEntry} 
-                disabled={saving || !editContent.trim()}
+                disabled={saving || !editTitle.trim() || !editContent.trim()}
               >
                 {saving ? 'Saving...' : 'Save Entry'}
               </button>
@@ -306,20 +307,21 @@ export default function DiaryView({ diary, onBack, onDiaryDeleted, onDiaryUpdate
             <form onSubmit={handleAddEntry} className="entry-form-modal">
               <input
                 type="text"
-                placeholder="Entry title (optional)"
+                placeholder="Entry title"
                 value={title}
                 onChange={(e) => setTitle(e.target.value)}
                 disabled={saving}
+                required
+                autoFocus
               />
               <textarea
                 placeholder="Write your thoughts..."
                 value={content}
                 onChange={(e) => setContent(e.target.value)}
                 disabled={saving}
-                autoFocus
               />
               <div className="form-actions">
-                <button type="submit" disabled={saving || !content.trim()}>
+                <button type="submit" disabled={saving || !title.trim() || !content.trim()}>
                   {saving ? 'Saving...' : 'Save Entry'}
                 </button>
                 <button

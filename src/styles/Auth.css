@@ -146,3 +146,151 @@
   padding: 0;
   accent-color: #7a6f6a;
 }
+
+/* Mobile Responsive */
+@media (max-width: 768px) {
+  .auth-container {
+    padding: 16px;
+  }
+
+  .auth-card {
+    max-width: 100%;
+    padding: 32px 20px;
+    border-radius: 6px;
+  }
+
+  .auth-logo img {
+    width: 60px;
+    height: 60px;
+  }
+
+  .auth-logo .app-name {
+    font-size: 26px;
+    letter-spacing: 0.3px;
+  }
+
+  .auth-logo .app-tagline {
+    font-size: 12px;
+  }
+
+  .auth-card form {
+    gap: 10px;
+  }
+
+  .auth-card input {
+    padding: 11px;
+    font-size: 13px;
+  }
+
+  .auth-card button[type='submit'] {
+    padding: 11px;
+    font-size: 13px;
+  }
+
+  .toggle-btn {
+    font-size: 12px;
+  }
+
+  .error,
+  .success {
+    font-size: 12px;
+  }
+
+  .terms-section {
+    gap: 10px;
+  }
+
+  .terms-checkbox {
+    font-size: 12px;
+  }
+}
+
+@media (max-width: 600px) {
+  .auth-container {
+    padding: 12px;
+    min-height: 100vh;
+  }
+
+  .auth-card {
+    max-width: 100%;
+    padding: 24px 16px;
+    border: none;
+    box-shadow: none;
+    background: #f5f5f0;
+  }
+
+  .auth-logo {
+    gap: 8px;
+    margin-bottom: 24px;
+  }
+
+  .auth-logo img {
+    width: 52px;
+    height: 52px;
+  }
+
+  .auth-logo .app-name {
+    font-size: 22px;
+    letter-spacing: 0.2px;
+  }
+
+  .auth-logo .app-tagline {
+    font-size: 11px;
+  }
+
+  .auth-card form {
+    gap: 10px;
+    margin-bottom: 16px;
+  }
+
+  .auth-card input {
+    padding: 10px;
+    font-size: 12px;
+    border-radius: 4px;
+  }
+
+  .auth-card button[type='submit'] {
+    padding: 10px;
+    font-size: 12px;
+    border-radius: 4px;
+  }
+
+  .toggle-btn {
+    padding: 8px;
+    font-size: 11px;
+  }
+
+  .error,
+  .success {
+    font-size: 11px;
+    margin-top: 8px;
+  }
+
+  .terms-section {
+    gap: 8px;
+  }
+
+  .terms-container {
+    padding: 12px;
+    max-height: 250px;
+    font-size: 11px;
+  }
+
+  .terms-container h2 {
+    font-size: 14px;
+  }
+
+  .terms-container h3 {
+    font-size: 12px;
+  }
+
+  .terms-checkbox {
+    font-size: 11px;
+    gap: 6px;
+  }
+
+  .terms-checkbox input[type='checkbox'] {
+    width: 14px;
+    height: 14px;
+  }
+}
