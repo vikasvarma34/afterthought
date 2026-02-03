@@ -15,6 +15,10 @@ export default function Home() {
   const [diaries, setDiaries] = useState([]);
   const [selectedDiary, setSelectedDiary] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [showCreateDiaryModal, setShowCreateDiaryModal] = useState(false);
+  const [newDiaryTitle, setNewDiaryTitle] = useState('');
+  const [creatingDiary, setCreatingDiary] = useState(false);
+  const [showSettings, setShowSettings] = useState(false);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -77,6 +81,17 @@ export default function Home() {
     }
   };
 
+  const handleCreateDiaryFromModal = async (e) => {
+    e.preventDefault();
+    if (!newDiaryTitle.trim()) return;
+
+    setCreatingDiary(true);
+    await handleCreateDiary(newDiaryTitle);
+    setNewDiaryTitle('');
+    setShowCreateDiaryModal(false);
+    setCreatingDiary(false);
+  };
+
   const handleDiaryDeleted = () => {
     setSelectedDiary(null);
     fetchDiaries(user.id);
@@ -87,13 +102,35 @@ export default function Home() {
   return (
     <div className="home">
       <div className="header">
-        <h1>
+        <h1 className="header-title">
           <img src={logo} alt="afterThoughts" />
-          afterThoughts
+          <span className="app-name">afterThoughts</span>
         </h1>
-        <button className="logout-btn" onClick={handleLogout}>
-          Logout
-        </button>
+        <div className="header-right">
+          <button className="settings-btn" onClick={() => setShowSettings(!showSettings)}>
+            ⚙️
+          </button>
+          {showSettings && user && (
+            <>
+              <div className="settings-overlay" onClick={() => setShowSettings(false)}></div>
+              <div className="settings-menu">
+                <div className="settings-user-info">
+                  <p className="settings-label">Name</p>
+                  <p className="settings-value">
+                    {`${user.user_metadata?.first_name || ''} ${user.user_metadata?.last_name || ''}`.trim() || 'User'}
+                  </p>
+                </div>
+                <div className="settings-user-info">
+                  <p className="settings-label">Email</p>
+                  <p className="settings-value">{user.email}</p>
+                </div>
+                <button className="settings-logout-btn" onClick={handleLogout}>
+                  Logout
+                </button>
+              </div>
+            </>
+          )}
+        </div>
       </div>
 
       <div className="content">
@@ -110,15 +147,45 @@ export default function Home() {
             onDiaryUpdated={() => fetchDiaries(user.id)}
           />
         ) : diaries.length === 0 ? (
-          <EmptyState
-            title="No diaries yet"
-            description="Create your first diary to begin writing."
-            buttonText="Create diary"
-            onButtonClick={() => {
-              const title = prompt('Diary title:');
-              if (title) handleCreateDiary(title);
-            }}
-          />
+          <>
+            <EmptyState
+              title="No diaries yet"
+              description="Create your first diary to begin writing."
+              buttonText="Create diary"
+              onButtonClick={() => setShowCreateDiaryModal(true)}
+            />
+            {showCreateDiaryModal && (
+              <>
+                <div className="modal-overlay" onClick={() => setShowCreateDiaryModal(false)}></div>
+                <div className="create-diary-modal">
+                  <h2>Create a new diary</h2>
+                  <form onSubmit={handleCreateDiaryFromModal}>
+                    <input
+                      type="text"
+                      placeholder="Diary title"
+                      value={newDiaryTitle}
+                      onChange={(e) => setNewDiaryTitle(e.target.value)}
+                      disabled={creatingDiary}
+                      autoFocus
+                    />
+                    <div className="modal-actions">
+                      <button type="submit" disabled={creatingDiary || !newDiaryTitle.trim()}>
+                        {creatingDiary ? 'Creating...' : 'Create'}
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => setShowCreateDiaryModal(false)}
+                        className="cancel-btn"
+                        disabled={creatingDiary}
+                      >
+                        Cancel
+                      </button>
+                    </div>
+                  </form>
+                </div>
+              </>
+            )}
+          </>
         ) : (
           <Placeholder
             message="Select a diary to start writing"

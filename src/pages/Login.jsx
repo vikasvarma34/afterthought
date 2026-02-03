@@ -9,6 +9,8 @@ import '../styles/Terms.css';
 export default function Login() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [firstName, setFirstName] = useState('');
+  const [lastName, setLastName] = useState('');
   const [isLogin, setIsLogin] = useState(true);
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
@@ -41,9 +43,15 @@ export default function Login() {
         }
         // Account was created (ignore email confirmation warnings)
         if (data?.user) {
+          // Store first and last name in user metadata
+          await supabase.auth.updateUser({
+            data: { first_name: firstName, last_name: lastName }
+          });
           setSuccess('Account created successfully. Please log in.');
           setEmail('');
           setPassword('');
+          setFirstName('');
+          setLastName('');
           setAgreedToTerms(false);
           setTimeout(() => setIsLogin(true), 2000);
         } else {
@@ -62,6 +70,8 @@ export default function Login() {
     setSuccess('');
     setEmail('');
     setPassword('');
+    setFirstName('');
+    setLastName('');
     setAgreedToTerms(false);
     setIsLogin(!isLogin);
   };
@@ -71,7 +81,8 @@ export default function Login() {
       <div className="auth-card">
         <div className="auth-logo">
           <img src={logo} alt="afterThoughts" />
-          <h1>afterThoughts</h1>
+          <h1 className="app-name">afterThoughts</h1>
+          <p className="app-tagline">For thoughts that return</p>
         </div>
         <form onSubmit={handleAuth}>
           <input
@@ -88,6 +99,25 @@ export default function Login() {
             onChange={(e) => setPassword(e.target.value)}
             required
           />
+
+          {!isLogin && (
+            <>
+              <input
+                type="text"
+                placeholder="First name"
+                value={firstName}
+                onChange={(e) => setFirstName(e.target.value)}
+                required
+              />
+              <input
+                type="text"
+                placeholder="Last name"
+                value={lastName}
+                onChange={(e) => setLastName(e.target.value)}
+                required
+              />
+            </>
+          )}
 
           {!isLogin && (
             <div className="terms-section">

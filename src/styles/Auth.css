@@ -18,27 +18,36 @@
 
 .auth-logo {
   display: flex;
-  flex-direction: row;
+  flex-direction: column;
   align-items: center;
-  gap: 2px;
+  gap: 12px;
   margin-bottom: 32px;
   justify-content: center;
 }
 
 .auth-logo img {
-  width: 64px;
-  height: 64px;
+  width: 72px;
+  height: 72px;
   object-fit: contain;
   opacity: 0.8;
 }
 
-.auth-logo h1 {
-  font-size: 26px;
+.auth-logo .app-name {
+  font-family: 'Playfair Display', serif;
+  font-size: 32px;
   font-weight: 400;
   color: #4a4741;
-  letter-spacing: -0.3px;
+  letter-spacing: 0.5px;
   margin: 0;
   display: block;
+}
+
+.auth-logo .app-tagline {
+  font-size: 13px;
+  color: #a8a89d;
+  margin: 0;
+  letter-spacing: 0.2px;
+  font-weight: 400;
 }
 
 .auth-card form {

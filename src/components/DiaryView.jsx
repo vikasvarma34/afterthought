@@ -15,6 +15,7 @@ export default function DiaryView({ diary, onBack, onDiaryDeleted, onDiaryUpdate
   const [editContent, setEditContent] = useState('');
   const [editingDiary, setEditingDiary] = useState(false);
   const [diaryTitle, setDiaryTitle] = useState(diary.title);
+  const [showNewEntryForm, setShowNewEntryForm] = useState(false);
 
   useEffect(() => {
     const fetchEntries = async () => {
@@ -67,6 +68,7 @@ export default function DiaryView({ diary, onBack, onDiaryDeleted, onDiaryUpdate
       setEntries([data[0], ...entries]);
       setContent('');
       setTitle('');
+      setShowNewEntryForm(false);
     }
     setSaving(false);
   };
@@ -118,6 +120,7 @@ export default function DiaryView({ diary, onBack, onDiaryDeleted, onDiaryUpdate
     } else {
       console.log('Entry deleted successfully');
       setEntries(entries.filter((e) => e.id !== entryId));
+      setEditingEntry(null);
     }
   };
 
@@ -154,59 +157,83 @@ export default function DiaryView({ diary, onBack, onDiaryDeleted, onDiaryUpdate
   const handleDeleteDiary = async () => {
     if (!confirm('Delete this diary and all its entries?')) return;
 
-    const { error } = await supabase
+    // Delete all entries first
+    const { error: entriesError } = await supabase
+      .from('entries')
+      .delete()
+      .eq('diary_id', diary.uuid);
+
+    if (entriesError) {
+      console.error('Delete entries failed:', entriesError);
+      alert('Failed to delete entries: ' + entriesError.message);
+      return;
+    }
+
+    // Then delete the diary
+    const { error: diaryError } = await supabase
       .from('diaries')
       .delete()
       .eq('uuid', diary.uuid);
 
-    if (error) {
-      console.error('Delete diary failed:', error);
+    if (diaryError) {
+      console.error('Delete diary failed:', diaryError);
     } else {
       onDiaryDeleted();
     }
+  };
+
+  const truncatePreview = (text, lines = 2) => {
+    const lineArray = text.split('\n').slice(0, lines);
+    const preview = lineArray.join('\n');
+    return preview.length > 150 ? preview.substring(0, 150) + '...' : preview;
   };
 
   if (loading) return <div className="loading">Loading entries...</div>;
 
   if (editingEntry) {
     return (
-      <div className="diary-view">
-        <div className="diary-header">
-          <button className="back-btn" onClick={() => setEditingEntry(null)}>
-            ← Back
-          </button>
-          <h2>Edit Entry</h2>
-          <div></div>
-        </div>
-
-        <div className="edit-entry-form">
-          <input
-            type="text"
-            placeholder="Entry title (optional)"
-            value={editTitle}
-            onChange={(e) => setEditTitle(e.target.value)}
-            disabled={saving}
-          />
-          <textarea
-            placeholder="Entry content"
-            value={editContent}
-            onChange={(e) => setEditContent(e.target.value)}
-            disabled={saving}
-          />
-          <div className="form-actions">
-            <button onClick={handleSaveEntry} disabled={saving || !editContent.trim()}>
-              {saving ? 'Saving...' : 'Save Entry'}
-            </button>
-            <button
-              onClick={() => handleDeleteEntry(editingEntry.id)}
-              className="delete-btn"
-              disabled={saving}
-            >
-              Delete Entry
-            </button>
+      <>
+        <div className="modal-overlay" onClick={() => setEditingEntry(null)}></div>
+        <div className="entry-modal">
+          <div className="entry-modal-header">
+            <h2>Edit Entry</h2>
+            <button className="close-btn" onClick={() => setEditingEntry(null)}>×</button>
           </div>
+          <form className="entry-form-modal">
+            <input
+              type="text"
+              placeholder="Entry title (optional)"
+              value={editTitle}
+              onChange={(e) => setEditTitle(e.target.value)}
+              disabled={saving}
+            />
+            <textarea
+              placeholder="Entry content"
+              value={editContent}
+              onChange={(e) => setEditContent(e.target.value)}
+              disabled={saving}
+              autoFocus
+            />
+            <div className="form-actions">
+              <button 
+                type="button"
+                onClick={handleSaveEntry} 
+                disabled={saving || !editContent.trim()}
+              >
+                {saving ? 'Saving...' : 'Save Entry'}
+              </button>
+              <button
+                type="button"
+                onClick={() => handleDeleteEntry(editingEntry.id)}
+                className="delete-btn"
+                disabled={saving}
+              >
+                Delete Entry
+              </button>
+            </div>
+          </form>
         </div>
-      </div>
+      </>
     );
   }
 
@@ -264,24 +291,50 @@ export default function DiaryView({ diary, onBack, onDiaryDeleted, onDiaryUpdate
         </div>
       </div>
 
-      <form onSubmit={handleAddEntry} className="entry-form">
-        <input
-          type="text"
-          placeholder="Entry title (optional)"
-          value={title}
-          onChange={(e) => setTitle(e.target.value)}
-          disabled={saving}
-        />
-        <textarea
-          placeholder="Write your thoughts..."
-          value={content}
-          onChange={(e) => setContent(e.target.value)}
-          disabled={saving}
-        />
-        <button type="submit" disabled={saving || !content.trim()}>
-          {saving ? 'Saving...' : 'Add Entry'}
-        </button>
-      </form>
+      {!showNewEntryForm && (
+        <div className="new-entry-cta">
+          <button onClick={() => setShowNewEntryForm(true)} className="cta-btn">
+            + Write a new entry
+          </button>
+        </div>
+      )}
+
+      {showNewEntryForm && (
+        <>
+          <div className="modal-overlay" onClick={() => setShowNewEntryForm(false)}></div>
+          <div className="entry-modal">
+            <form onSubmit={handleAddEntry} className="entry-form-modal">
+              <input
+                type="text"
+                placeholder="Entry title (optional)"
+                value={title}
+                onChange={(e) => setTitle(e.target.value)}
+                disabled={saving}
+              />
+              <textarea
+                placeholder="Write your thoughts..."
+                value={content}
+                onChange={(e) => setContent(e.target.value)}
+                disabled={saving}
+                autoFocus
+              />
+              <div className="form-actions">
+                <button type="submit" disabled={saving || !content.trim()}>
+                  {saving ? 'Saving...' : 'Save Entry'}
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setShowNewEntryForm(false)}
+                  className="cancel-btn"
+                  disabled={saving}
+                >
+                  Cancel
+                </button>
+              </div>
+            </form>
+          </div>
+        </>
+      )}
 
       {entries.length === 0 ? (
         <Placeholder
@@ -296,11 +349,13 @@ export default function DiaryView({ diary, onBack, onDiaryDeleted, onDiaryUpdate
               className="entry-item"
               onClick={() => handleEditEntry(entry)}
             >
-              {entry.title && <h3>{entry.title}</h3>}
-              <p className="date">
-                {new Date(entry.created_at).toLocaleString()}
-              </p>
-              <p className="content">{entry.content}</p>
+              <div className="entry-header">
+                {entry.title && <h3>{entry.title}</h3>}
+                <p className="date">
+                  {new Date(entry.created_at).toLocaleString()}
+                </p>
+              </div>
+              <p className="preview">{truncatePreview(entry.content)}</p>
             </div>
           ))}
         </div>
