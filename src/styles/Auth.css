@@ -71,6 +71,93 @@
   color: #b8b8b0;
 }
 
+/* Password Field with Visibility Toggle */
+.password-field {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.password-input-wrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.password-input-wrapper input {
+  width: 100%;
+  padding-right: 40px;
+}
+
+.toggle-visibility {
+  position: absolute;
+  right: 12px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: 16px;
+  padding: 4px 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0.7;
+  transition: opacity 0.2s;
+}
+
+.toggle-visibility:hover {
+  opacity: 1;
+}
+
+/* Password Validation Messages */
+.password-validation {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: 8px 0;
+}
+
+.validation-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 12px;
+  transition: color 0.2s;
+}
+
+.validation-item.valid {
+  color: #6b9b7a;
+}
+
+.validation-item.invalid {
+  color: #a8a89d;
+}
+
+.validation-icon {
+  min-width: 14px;
+  text-align: center;
+}
+
+.validation-item.valid .validation-icon {
+  color: #6b9b7a;
+}
+
+.validation-item.invalid .validation-icon {
+  color: #d8d8d0;
+}
+
+/* Error and Success Messages for Password Match */
+.error-message {
+  font-size: 12px;
+  color: #c85a54;
+  padding: 0 2px;
+}
+
+.success-message {
+  font-size: 12px;
+  color: #6b9b7a;
+  padding: 0 2px;
+}
+
 .auth-card button[type='submit'] {
   width: 100%;
   padding: 12px;
@@ -182,6 +269,24 @@
     font-size: 13px;
   }
 
+  .password-field {
+    gap: 6px;
+  }
+
+  .password-validation {
+    gap: 5px;
+    padding: 6px 0;
+  }
+
+  .validation-item {
+    font-size: 11px;
+  }
+
+  .error-message,
+  .success-message {
+    font-size: 11px;
+  }
+
   .auth-card button[type='submit'] {
     padding: 11px;
     font-size: 13px;
@@ -247,6 +352,24 @@
     padding: 10px;
     font-size: 12px;
     border-radius: 4px;
+  }
+
+  .password-field {
+    gap: 5px;
+  }
+
+  .password-validation {
+    gap: 4px;
+    padding: 5px 0;
+  }
+
+  .validation-item {
+    font-size: 10px;
+  }
+
+  .error-message,
+  .success-message {
+    font-size: 10px;
   }
 
   .auth-card button[type='submit'] {

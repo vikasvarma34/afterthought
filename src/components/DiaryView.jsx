@@ -207,7 +207,6 @@ export default function DiaryView({ diary, onBack, onDiaryDeleted, onDiaryUpdate
               onChange={(e) => setEditTitle(e.target.value)}
               disabled={saving}
               required
-              autoFocus
             />
             <textarea
               placeholder="Entry content"
@@ -256,7 +255,6 @@ export default function DiaryView({ diary, onBack, onDiaryDeleted, onDiaryUpdate
             value={diaryTitle}
             onChange={(e) => setDiaryTitle(e.target.value)}
             disabled={saving}
-            autoFocus
           />
           <div className="form-actions">
             <button onClick={handleSaveDiary} disabled={saving || !diaryTitle.trim()}>
@@ -312,7 +310,6 @@ export default function DiaryView({ diary, onBack, onDiaryDeleted, onDiaryUpdate
                 onChange={(e) => setTitle(e.target.value)}
                 disabled={saving}
                 required
-                autoFocus
               />
               <textarea
                 placeholder="Write your thoughts..."
