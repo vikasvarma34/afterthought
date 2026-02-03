@@ -1,0 +1,15 @@
+{
+  "appId": "com.afterthoughts.app",
+  "appName": "afterThoughts",
+  "webDir": "dist",
+  "plugins": {
+    "SplashScreen": {
+      "launchShowDuration": 0
+    }
+  },
+  "server": {
+    "url": "https://afterthought.onrender.com",
+    "androidScheme": "https",
+    "cleartext": false
+  }
+}
