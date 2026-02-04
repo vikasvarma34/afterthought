@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useRef, useCallback } from 'react';
 import { supabase } from '../lib/supabase';
 import Placeholder from './Placeholder';
 import '../styles/DiaryView.css';
@@ -16,7 +16,200 @@ export default function DiaryView({ diary, onBack, onDiaryDeleted, onDiaryUpdate
   const [editingDiary, setEditingDiary] = useState(false);
   const [diaryTitle, setDiaryTitle] = useState(diary.title);
   const [showNewEntryForm, setShowNewEntryForm] = useState(false);
+  
+  // Autosave & draft state
+  const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
+  const autosaveIntervalRef = useRef(null);
+  const draftEntryIdRef = useRef(null);
+  
+  // Refs to always have latest values
+  const titleRef = useRef('');
+  const contentRef = useRef('');
+  const unsavedRef = useRef(false);
+  
+  // Refs for edit mode autosave
+  const editTitleRef = useRef('');
+  const editContentRef = useRef('');
+  const editUnsavedRef = useRef(false);
 
+  // Autosave for NEW entries (drafts)
+  const autosaveToDB = useCallback(async () => {
+    if (!titleRef.current.trim() || !contentRef.current.trim()) return;
+
+    console.log('Autosaving draft...');
+    try {
+      if (!draftEntryIdRef.current) {
+        const { data, error } = await supabase
+          .from('entries')
+          .insert([{ diary_id: diary.uuid, title: titleRef.current, content: contentRef.current, is_draft: true }])
+          .select();
+
+        if (error) throw error;
+        if (data && data[0]) {
+          draftEntryIdRef.current = data[0].id;
+          console.log('Draft created:', data[0].id);
+        }
+      } else {
+        const { error } = await supabase
+          .from('entries')
+          .update({ title: titleRef.current, content: contentRef.current })
+          .eq('id', draftEntryIdRef.current);
+
+        if (error) throw error;
+        console.log('Draft saved:', draftEntryIdRef.current);
+      }
+
+      setHasUnsavedChanges(false);
+
+      // Refresh entries list to show updated draft
+      const { data: updatedEntries } = await supabase
+        .from('entries')
+        .select('*')
+        .eq('diary_id', diary.uuid)
+        .order('created_at', { ascending: false });
+      
+      setEntries(updatedEntries || []);
+    } catch (error) {
+      console.error('Autosave error:', error);
+    }
+  }, [diary.uuid]);
+
+  // Autosave for EXISTING entries (editing)
+  const autosaveEditEntry = useCallback(async () => {
+    if (!editTitleRef.current.trim() || !editContentRef.current.trim()) return;
+    if (!editingEntry) return;
+
+    console.log('Autosaving entry:', editingEntry.id);
+    try {
+      const { error } = await supabase
+        .from('entries')
+        .update({ title: editTitleRef.current, content: editContentRef.current })
+        .eq('id', editingEntry.id);
+
+      if (error) throw error;
+      console.log('Entry saved:', editingEntry.id);
+      setHasUnsavedChanges(false);
+
+      // Refresh entries list to show updated entry
+      const { data: updatedEntries } = await supabase
+        .from('entries')
+        .select('*')
+        .eq('diary_id', diary.uuid)
+        .order('created_at', { ascending: false });
+      
+      setEntries(updatedEntries || []);
+    } catch (error) {
+      console.error('Autosave error:', error);
+    }
+  }, [editingEntry, diary.uuid]);
+
+  // Track content changes
+  const handleContentChange = (newTitle, newContent) => {
+    titleRef.current = newTitle;
+    contentRef.current = newContent;
+    unsavedRef.current = true;
+    setTitle(newTitle);
+    setContent(newContent);
+    setHasUnsavedChanges(true);
+  };
+
+  // Handle closing form - show gentle warning if unsaved
+  const handleDiscardDraft = () => {
+    if (hasUnsavedChanges) {
+      const confirmed = window.confirm('Are you sure you want to go back without saving?');
+      if (!confirmed) return;
+    }
+    
+    setShowNewEntryForm(false);
+    setContent('');
+    setTitle('');
+    setHasUnsavedChanges(false);
+    titleRef.current = '';
+    contentRef.current = '';
+    unsavedRef.current = false;
+    draftEntryIdRef.current = null;
+  };
+
+  // 10-second autosave interval (for new entries)
+  useEffect(() => {
+    if (showNewEntryForm && hasUnsavedChanges) {
+      autosaveIntervalRef.current = setInterval(() => {
+        autosaveToDB();
+      }, 10000);
+
+      return () => {
+        if (autosaveIntervalRef.current) {
+          clearInterval(autosaveIntervalRef.current);
+        }
+      };
+    }
+  }, [showNewEntryForm, hasUnsavedChanges, autosaveToDB]);
+
+  // 10-second autosave interval (for editing existing entries)
+  useEffect(() => {
+    if (editingEntry && hasUnsavedChanges) {
+      autosaveIntervalRef.current = setInterval(() => {
+        autosaveEditEntry();
+      }, 10000);
+
+      return () => {
+        if (autosaveIntervalRef.current) {
+          clearInterval(autosaveIntervalRef.current);
+        }
+      };
+    }
+  }, [editingEntry, hasUnsavedChanges, autosaveEditEntry]);
+
+  // Beforeunload listener - warn if unsaved
+  useEffect(() => {
+    const handleBeforeUnload = (e) => {
+      if (hasUnsavedChanges && showNewEntryForm) {
+        e.preventDefault();
+        e.returnValue = 'You have unsaved writing. Leaving will lose your changes.';
+        return 'You have unsaved writing. Leaving will lose your changes.';
+      }
+    };
+
+    window.addEventListener('beforeunload', handleBeforeUnload);
+    return () => window.removeEventListener('beforeunload', handleBeforeUnload);
+  }, [hasUnsavedChanges, showNewEntryForm]);
+
+  // Restore draft on mount from DB (don't auto-open form)
+  useEffect(() => {
+    const restoreDraft = async () => {
+      if (!diary?.uuid) return;
+
+      try {
+        const { data, error } = await supabase
+          .from('entries')
+          .select('*')
+          .eq('diary_id', diary.uuid)
+          .eq('is_draft', true)
+          .order('updated_at', { ascending: false })
+          .limit(1);
+
+        if (!error && data && data[0]) {
+          const restoredTitle = data[0].title || '';
+          const restoredContent = data[0].content || '';
+          titleRef.current = restoredTitle;
+          contentRef.current = restoredContent;
+          unsavedRef.current = false;
+          setTitle(restoredTitle);
+          setContent(restoredContent);
+          draftEntryIdRef.current = data[0].id;
+          console.log('Draft ready:', data[0].id);
+        }
+      } catch (e) {
+        console.error('Failed to restore draft:', e);
+      }
+    };
+
+    if (diary?.uuid) {
+      restoreDraft();
+    }
+  }, [diary?.uuid]);
+
+  // Fetch entries (include drafts)
   useEffect(() => {
     const fetchEntries = async () => {
       setLoading(true);
@@ -54,29 +247,65 @@ export default function DiaryView({ diary, onBack, onDiaryDeleted, onDiaryUpdate
     }
 
     setSaving(true);
-    console.log('Adding entry with diary_id:', diary.uuid);
-    const { data, error } = await supabase
-      .from('entries')
-      .insert([{ diary_id: diary.uuid, title, content }])
-      .select();
+    try {
+      if (draftEntryIdRef.current) {
+        // Convert draft to real entry by removing is_draft flag
+        const { error } = await supabase
+          .from('entries')
+          .update({ title, content, is_draft: false })
+          .eq('id', draftEntryIdRef.current);
 
-    if (error) {
-      console.error('Entry insert failed:', error);
-      alert('Failed to save entry: ' + error.message);
-    } else if (data) {
-      console.log('Entry saved successfully:', data);
-      setEntries([data[0], ...entries]);
+        if (error) throw error;
+        console.log('Draft published:', draftEntryIdRef.current);
+      } else {
+        // Create new entry if no draft existed
+        const { error } = await supabase
+          .from('entries')
+          .insert([{ diary_id: diary.uuid, title, content, is_draft: false }])
+          .select();
+
+        if (error) throw error;
+        console.log('Entry saved successfully');
+      }
+
+      // Refresh entries list (include drafts)
+      const { data: allEntries } = await supabase
+        .from('entries')
+        .select('*')
+        .eq('diary_id', diary.uuid)
+        .order('created_at', { ascending: false });
+
+      setEntries(allEntries || []);
       setContent('');
       setTitle('');
       setShowNewEntryForm(false);
+      setHasUnsavedChanges(false);
+      draftEntryIdRef.current = null;
+    } catch (error) {
+      console.error('Entry save failed:', error);
+      alert('Failed to save entry: ' + error.message);
     }
     setSaving(false);
   };
 
   const handleEditEntry = (entry) => {
     setEditingEntry(entry);
-    setEditTitle(entry.title || '');
-    setEditContent(entry.content);
+    const title = entry.title || '';
+    const content = entry.content;
+    setEditTitle(title);
+    setEditContent(content);
+    editTitleRef.current = title;
+    editContentRef.current = content;
+    editUnsavedRef.current = false;
+  };
+
+  const handleEditChange = (newTitle, newContent) => {
+    setEditTitle(newTitle);
+    setEditContent(newContent);
+    editTitleRef.current = newTitle;
+    editContentRef.current = newContent;
+    editUnsavedRef.current = true;
+    setHasUnsavedChanges(true);
   };
 
   const handleSaveEntry = async () => {
@@ -92,7 +321,6 @@ export default function DiaryView({ diary, onBack, onDiaryDeleted, onDiaryUpdate
       console.error('Entry update failed:', error);
       alert('Failed to update entry: ' + error.message);
     } else {
-      console.log('Entry updated successfully');
       const updatedEntries = entries.map((e) =>
         e.id === editingEntry.id
           ? { ...e, title: editTitle, content: editContent }
@@ -102,6 +330,10 @@ export default function DiaryView({ diary, onBack, onDiaryDeleted, onDiaryUpdate
       setEditingEntry(null);
       setEditTitle('');
       setEditContent('');
+      setHasUnsavedChanges(false);
+      editUnsavedRef.current = false;
+      editTitleRef.current = '';
+      editContentRef.current = '';
     }
     setSaving(false);
   };
@@ -191,36 +423,50 @@ export default function DiaryView({ diary, onBack, onDiaryDeleted, onDiaryUpdate
   if (loading) return <div className="loading">Loading entries...</div>;
 
   if (editingEntry) {
+    const handleCloseEdit = () => {
+      if (hasUnsavedChanges) {
+        const confirmed = window.confirm('Are you sure you want to go back without saving?');
+        if (!confirmed) return;
+      }
+      setEditingEntry(null);
+      setEditTitle('');
+      setEditContent('');
+      setHasUnsavedChanges(false);
+      editUnsavedRef.current = false;
+      editTitleRef.current = '';
+      editContentRef.current = '';
+    };
+
     return (
       <>
-        <div className="modal-overlay" onClick={() => setEditingEntry(null)}></div>
+        <div className="modal-overlay" onClick={handleCloseEdit}></div>
         <div className="entry-modal">
           <div className="entry-modal-header">
             <h2>Edit Entry</h2>
-            <button className="close-btn" onClick={() => setEditingEntry(null)}>×</button>
+            <button className="close-btn" onClick={handleCloseEdit}>×</button>
           </div>
           <form className="entry-form-modal">
             <input
               type="text"
               placeholder="Entry title"
               value={editTitle}
-              onChange={(e) => setEditTitle(e.target.value)}
+              onChange={(e) => handleEditChange(e.target.value, editContent)}
               disabled={saving}
               required
             />
             <textarea
               placeholder="Entry content"
               value={editContent}
-              onChange={(e) => setEditContent(e.target.value)}
+              onChange={(e) => handleEditChange(editTitle, e.target.value)}
               disabled={saving}
             />
             <div className="form-actions">
               <button 
                 type="button"
                 onClick={handleSaveEntry} 
-                disabled={saving || !editTitle.trim() || !editContent.trim()}
+                disabled={!hasUnsavedChanges || !editTitle.trim() || !editContent.trim()}
               >
-                {saving ? 'Saving...' : 'Save Entry'}
+                {saving ? 'Saving...' : !hasUnsavedChanges && editTitle.trim() && editContent.trim() ? 'Saved' : 'Save Entry'}
               </button>
               <button
                 type="button"
@@ -273,10 +519,18 @@ export default function DiaryView({ diary, onBack, onDiaryDeleted, onDiaryUpdate
     );
   }
 
+  const handleBackClick = () => {
+    if (hasUnsavedChanges) {
+      const confirmed = window.confirm('Are you sure you want to go back without saving?');
+      if (!confirmed) return;
+    }
+    onBack();
+  };
+
   return (
     <div className="diary-view">
       <div className="diary-header">
-        <button className="back-btn" onClick={onBack}>
+        <button className="back-btn" onClick={handleBackClick}>
           ← Back
         </button>
         <h2>{diary.title}</h2>
@@ -307,23 +561,23 @@ export default function DiaryView({ diary, onBack, onDiaryDeleted, onDiaryUpdate
                 type="text"
                 placeholder="Entry title"
                 value={title}
-                onChange={(e) => setTitle(e.target.value)}
+                onChange={(e) => handleContentChange(e.target.value, content)}
                 disabled={saving}
                 required
               />
               <textarea
                 placeholder="Write your thoughts..."
                 value={content}
-                onChange={(e) => setContent(e.target.value)}
+                onChange={(e) => handleContentChange(title, e.target.value)}
                 disabled={saving}
               />
               <div className="form-actions">
-                <button type="submit" disabled={saving || !title.trim() || !content.trim()}>
-                  {saving ? 'Saving...' : 'Save Entry'}
+                <button type="submit" disabled={!hasUnsavedChanges || !title.trim() || !content.trim()}>
+                  {saving ? 'Saving...' : !hasUnsavedChanges && title.trim() && content.trim() ? 'Saved' : 'Save Entry'}
                 </button>
                 <button
                   type="button"
-                  onClick={() => setShowNewEntryForm(false)}
+                  onClick={handleDiscardDraft}
                   className="cancel-btn"
                   disabled={saving}
                 >
@@ -349,7 +603,10 @@ export default function DiaryView({ diary, onBack, onDiaryDeleted, onDiaryUpdate
               onClick={() => handleEditEntry(entry)}
             >
               <div className="entry-header">
-                {entry.title && <h3>{entry.title}</h3>}
+                <div>
+                  {entry.title && <h3>{entry.title}</h3>}
+                  {entry.is_draft && <span className="draft-badge">Draft</span>}
+                </div>
                 <p className="date">
                   {new Date(entry.created_at).toLocaleString()}
                 </p>

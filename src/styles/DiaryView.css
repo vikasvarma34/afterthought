@@ -393,6 +393,17 @@
   flex-shrink: 0;
 }
 
+.draft-badge {
+  display: inline-block;
+  font-size: 10px;
+  color: #c85a54;
+  background: #f5e6e3;
+  padding: 2px 6px;
+  border-radius: 3px;
+  margin-top: 4px;
+  font-weight: 500;
+}
+
 .entry-item .preview {
   font-size: 14px;
   line-height: 1.5;
@@ -412,6 +423,33 @@
   color: #6a6a5f;
   white-space: pre-wrap;
   word-break: break-word;
+}
+
+/* Autosave status - simple cloud icon */
+.autosave-status {
+  display: flex;
+  justify-content: center;
+  padding: 6px 0;
+  font-size: 18px;
+}
+
+.save-icon {
+  display: inline-block;
+  animation: fadeIn 0.3s ease-in;
+}
+
+.save-icon.saving {
+  animation: float 1s ease-in-out infinite;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes float {
+  0%, 100% { transform: translateY(0); opacity: 0.7; }
+  50% { transform: translateY(-2px); opacity: 1; }
 }
 
 .empty {
