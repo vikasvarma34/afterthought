@@ -17,26 +17,23 @@ export default function DiaryView({ diary, onBack, onDiaryDeleted, onDiaryUpdate
   const [diaryTitle, setDiaryTitle] = useState(diary.title);
   const [showNewEntryForm, setShowNewEntryForm] = useState(false);
   
-  // Autosave & draft state
-  const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
+  // Autosave & draft state (silent, no UI feedback)
   const autosaveIntervalRef = useRef(null);
+  const autosaveTimerRef = useRef(null);
   const draftEntryIdRef = useRef(null);
   
   // Refs to always have latest values
   const titleRef = useRef('');
   const contentRef = useRef('');
-  const unsavedRef = useRef(false);
   
   // Refs for edit mode autosave
   const editTitleRef = useRef('');
   const editContentRef = useRef('');
-  const editUnsavedRef = useRef(false);
 
-  // Autosave for NEW entries (drafts)
+  // Autosave for NEW entries (drafts) - silent, no UI feedback
   const autosaveToDB = useCallback(async () => {
     if (!titleRef.current.trim() || !contentRef.current.trim()) return;
 
-    console.log('Autosaving draft...');
     try {
       if (!draftEntryIdRef.current) {
         const { data, error } = await supabase
@@ -47,7 +44,6 @@ export default function DiaryView({ diary, onBack, onDiaryDeleted, onDiaryUpdate
         if (error) throw error;
         if (data && data[0]) {
           draftEntryIdRef.current = data[0].id;
-          console.log('Draft created:', data[0].id);
         }
       } else {
         const { error } = await supabase
@@ -56,12 +52,9 @@ export default function DiaryView({ diary, onBack, onDiaryDeleted, onDiaryUpdate
           .eq('id', draftEntryIdRef.current);
 
         if (error) throw error;
-        console.log('Draft saved:', draftEntryIdRef.current);
       }
 
-      setHasUnsavedChanges(false);
-
-      // Refresh entries list to show updated draft
+      // Silent refresh - no state updates that affect UI
       const { data: updatedEntries } = await supabase
         .from('entries')
         .select('*')
@@ -74,12 +67,12 @@ export default function DiaryView({ diary, onBack, onDiaryDeleted, onDiaryUpdate
     }
   }, [diary.uuid]);
 
-  // Autosave for EXISTING entries (editing)
+  // Autosave for EXISTING entries (editing) - silent, no UI feedback
+  // Keep draft status unchanged during autosave, only Save button finalizes
   const autosaveEditEntry = useCallback(async () => {
     if (!editTitleRef.current.trim() || !editContentRef.current.trim()) return;
     if (!editingEntry) return;
 
-    console.log('Autosaving entry:', editingEntry.id);
     try {
       const { error } = await supabase
         .from('entries')
@@ -87,10 +80,8 @@ export default function DiaryView({ diary, onBack, onDiaryDeleted, onDiaryUpdate
         .eq('id', editingEntry.id);
 
       if (error) throw error;
-      console.log('Entry saved:', editingEntry.id);
-      setHasUnsavedChanges(false);
 
-      // Refresh entries list to show updated entry
+      // Silent refresh - no state updates that affect UI
       const { data: updatedEntries } = await supabase
         .from('entries')
         .select('*')
@@ -103,36 +94,38 @@ export default function DiaryView({ diary, onBack, onDiaryDeleted, onDiaryUpdate
     }
   }, [editingEntry, diary.uuid]);
 
-  // Track content changes
+  // Track content changes and trigger instant autosave
   const handleContentChange = (newTitle, newContent) => {
     titleRef.current = newTitle;
     contentRef.current = newContent;
-    unsavedRef.current = true;
     setTitle(newTitle);
     setContent(newContent);
-    setHasUnsavedChanges(true);
+
+    // Trigger autosave within 1 second (silent)
+    if (autosaveTimerRef.current) {
+      clearTimeout(autosaveTimerRef.current);
+    }
+    autosaveTimerRef.current = setTimeout(() => {
+      autosaveToDB();
+    }, 1000);
   };
 
-  // Handle closing form - show gentle warning if unsaved
+  // Handle closing form
   const handleDiscardDraft = () => {
-    if (hasUnsavedChanges) {
-      const confirmed = window.confirm('Are you sure you want to go back without saving?');
-      if (!confirmed) return;
-    }
-    
     setShowNewEntryForm(false);
     setContent('');
     setTitle('');
-    setHasUnsavedChanges(false);
     titleRef.current = '';
     contentRef.current = '';
-    unsavedRef.current = false;
     draftEntryIdRef.current = null;
+    if (autosaveTimerRef.current) {
+      clearTimeout(autosaveTimerRef.current);
+    }
   };
 
-  // 10-second autosave interval (for new entries)
+  // Setup periodic autosave intervals (silent background)
   useEffect(() => {
-    if (showNewEntryForm && hasUnsavedChanges) {
+    if (showNewEntryForm) {
       autosaveIntervalRef.current = setInterval(() => {
         autosaveToDB();
       }, 10000);
@@ -143,11 +136,11 @@ export default function DiaryView({ diary, onBack, onDiaryDeleted, onDiaryUpdate
         }
       };
     }
-  }, [showNewEntryForm, hasUnsavedChanges, autosaveToDB]);
+  }, [showNewEntryForm, autosaveToDB]);
 
-  // 10-second autosave interval (for editing existing entries)
+  // Setup periodic autosave for editing (silent background)
   useEffect(() => {
-    if (editingEntry && hasUnsavedChanges) {
+    if (editingEntry) {
       autosaveIntervalRef.current = setInterval(() => {
         autosaveEditEntry();
       }, 10000);
@@ -158,21 +151,7 @@ export default function DiaryView({ diary, onBack, onDiaryDeleted, onDiaryUpdate
         }
       };
     }
-  }, [editingEntry, hasUnsavedChanges, autosaveEditEntry]);
-
-  // Beforeunload listener - warn if unsaved (NEW entries OR editing existing)
-  useEffect(() => {
-    const handleBeforeUnload = (e) => {
-      if (hasUnsavedChanges && (showNewEntryForm || editingEntry)) {
-        e.preventDefault();
-        e.returnValue = 'You have unsaved writing. Leaving will lose your changes.';
-        return 'You have unsaved writing. Leaving will lose your changes.';
-      }
-    };
-
-    window.addEventListener('beforeunload', handleBeforeUnload);
-    return () => window.removeEventListener('beforeunload', handleBeforeUnload);
-  }, [hasUnsavedChanges, showNewEntryForm, editingEntry]);
+  }, [editingEntry, autosaveEditEntry]);
 
   // Restore draft on mount from DB (don't auto-open form)
   useEffect(() => {
@@ -193,7 +172,6 @@ export default function DiaryView({ diary, onBack, onDiaryDeleted, onDiaryUpdate
           const restoredContent = data[0].content || '';
           titleRef.current = restoredTitle;
           contentRef.current = restoredContent;
-          unsavedRef.current = false;
           setTitle(restoredTitle);
           setContent(restoredContent);
           draftEntryIdRef.current = data[0].id;
@@ -279,7 +257,6 @@ export default function DiaryView({ diary, onBack, onDiaryDeleted, onDiaryUpdate
       setContent('');
       setTitle('');
       setShowNewEntryForm(false);
-      setHasUnsavedChanges(false);
       draftEntryIdRef.current = null;
     } catch (error) {
       console.error('Entry save failed:', error);
@@ -296,16 +273,21 @@ export default function DiaryView({ diary, onBack, onDiaryDeleted, onDiaryUpdate
     setEditContent(content);
     editTitleRef.current = title;
     editContentRef.current = content;
-    editUnsavedRef.current = false;
-  };
+    };
 
   const handleEditChange = (newTitle, newContent) => {
     setEditTitle(newTitle);
     setEditContent(newContent);
     editTitleRef.current = newTitle;
     editContentRef.current = newContent;
-    editUnsavedRef.current = true;
-    setHasUnsavedChanges(true);
+
+    // Trigger autosave within 1 second (silent)
+    if (autosaveTimerRef.current) {
+      clearTimeout(autosaveTimerRef.current);
+    }
+    autosaveTimerRef.current = setTimeout(() => {
+      autosaveEditEntry();
+    }, 1000);
   };
 
   const handleSaveEntry = async () => {
@@ -330,8 +312,6 @@ export default function DiaryView({ diary, onBack, onDiaryDeleted, onDiaryUpdate
       setEditingEntry(null);
       setEditTitle('');
       setEditContent('');
-      setHasUnsavedChanges(false);
-      editUnsavedRef.current = false;
       editTitleRef.current = '';
       editContentRef.current = '';
     }
@@ -424,17 +404,14 @@ export default function DiaryView({ diary, onBack, onDiaryDeleted, onDiaryUpdate
 
   if (editingEntry) {
     const handleCloseEdit = () => {
-      if (hasUnsavedChanges) {
-        const confirmed = window.confirm('Are you sure you want to go back without saving?');
-        if (!confirmed) return;
-      }
       setEditingEntry(null);
       setEditTitle('');
       setEditContent('');
-      setHasUnsavedChanges(false);
-      editUnsavedRef.current = false;
       editTitleRef.current = '';
       editContentRef.current = '';
+      if (autosaveTimerRef.current) {
+        clearTimeout(autosaveTimerRef.current);
+      }
     };
 
     return (
@@ -464,15 +441,14 @@ export default function DiaryView({ diary, onBack, onDiaryDeleted, onDiaryUpdate
               <button 
                 type="button"
                 onClick={handleSaveEntry} 
-                disabled={!hasUnsavedChanges || !editTitle.trim() || !editContent.trim()}
+                disabled={!editTitle.trim() || !editContent.trim()}
               >
-                {saving ? 'Saving...' : !hasUnsavedChanges && editTitle.trim() && editContent.trim() ? 'Saved' : 'Save Entry'}
+                Save Entry
               </button>
               <button
                 type="button"
                 onClick={() => handleDeleteEntry(editingEntry.id)}
                 className="delete-btn"
-                disabled={saving}
               >
                 Delete Entry
               </button>
@@ -520,22 +496,11 @@ export default function DiaryView({ diary, onBack, onDiaryDeleted, onDiaryUpdate
   }
 
   const handleBackClick = () => {
-    if (hasUnsavedChanges) {
-      const confirmed = window.confirm('Are you sure you want to go back without saving?');
-      if (!confirmed) return;
-    }
     onBack();
   };
 
   return (
     <div className="diary-view">
-      {/* Warning banner for unsaved changes */}
-      {hasUnsavedChanges && (showNewEntryForm || editingEntry) && (
-        <div className="unsaved-warning-banner">
-          <span>⚠️ You have unsaved changes. They will be auto-saved every 10 seconds.</span>
-        </div>
-      )}
-
       <div className="diary-header">
         <button className="back-btn" onClick={handleBackClick}>
           ← Back
@@ -579,14 +544,13 @@ export default function DiaryView({ diary, onBack, onDiaryDeleted, onDiaryUpdate
                 disabled={saving}
               />
               <div className="form-actions">
-                <button type="submit" disabled={!hasUnsavedChanges || !title.trim() || !content.trim()}>
-                  {saving ? 'Saving...' : !hasUnsavedChanges && title.trim() && content.trim() ? 'Saved' : 'Save Entry'}
+                <button type="submit" disabled={!title.trim() || !content.trim()}>
+                  Save Entry
                 </button>
                 <button
                   type="button"
                   onClick={handleDiscardDraft}
                   className="cancel-btn"
-                  disabled={saving}
                 >
                   Cancel
                 </button>

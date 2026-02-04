@@ -6,30 +6,6 @@
   overflow: hidden;
 }
 
-/* Unsaved changes warning banner */
-.unsaved-warning-banner {
-  background: #fff3cd;
-  border-bottom: 2px solid #ffc107;
-  padding: 12px 20px;
-  text-align: center;
-  font-size: 13px;
-  color: #856404;
-  font-weight: 500;
-  animation: slideDown 0.3s ease-out;
-  z-index: 50;
-}
-
-@keyframes slideDown {
-  from {
-    opacity: 0;
-    transform: translateY(-10px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
 .diary-header {
   display: flex;
   align-items: center;
@@ -229,8 +205,8 @@
 }
 
 .entry-form-modal textarea {
-  min-height: 250px;
-  max-height: 400px;
+  min-height: 400px;
+  max-height: 600px;
   resize: vertical;
   flex: 1;
 }
