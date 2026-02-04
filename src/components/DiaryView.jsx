@@ -160,10 +160,10 @@ export default function DiaryView({ diary, onBack, onDiaryDeleted, onDiaryUpdate
     }
   }, [editingEntry, hasUnsavedChanges, autosaveEditEntry]);
 
-  // Beforeunload listener - warn if unsaved
+  // Beforeunload listener - warn if unsaved (NEW entries OR editing existing)
   useEffect(() => {
     const handleBeforeUnload = (e) => {
-      if (hasUnsavedChanges && showNewEntryForm) {
+      if (hasUnsavedChanges && (showNewEntryForm || editingEntry)) {
         e.preventDefault();
         e.returnValue = 'You have unsaved writing. Leaving will lose your changes.';
         return 'You have unsaved writing. Leaving will lose your changes.';
@@ -172,7 +172,7 @@ export default function DiaryView({ diary, onBack, onDiaryDeleted, onDiaryUpdate
 
     window.addEventListener('beforeunload', handleBeforeUnload);
     return () => window.removeEventListener('beforeunload', handleBeforeUnload);
-  }, [hasUnsavedChanges, showNewEntryForm]);
+  }, [hasUnsavedChanges, showNewEntryForm, editingEntry]);
 
   // Restore draft on mount from DB (don't auto-open form)
   useEffect(() => {
@@ -314,7 +314,7 @@ export default function DiaryView({ diary, onBack, onDiaryDeleted, onDiaryUpdate
     setSaving(true);
     const { error } = await supabase
       .from('entries')
-      .update({ title: editTitle, content: editContent })
+      .update({ title: editTitle, content: editContent, is_draft: false })
       .eq('id', editingEntry.id);
 
     if (error) {
@@ -323,7 +323,7 @@ export default function DiaryView({ diary, onBack, onDiaryDeleted, onDiaryUpdate
     } else {
       const updatedEntries = entries.map((e) =>
         e.id === editingEntry.id
-          ? { ...e, title: editTitle, content: editContent }
+          ? { ...e, title: editTitle, content: editContent, is_draft: false }
           : e
       );
       setEntries(updatedEntries);
@@ -529,6 +529,13 @@ export default function DiaryView({ diary, onBack, onDiaryDeleted, onDiaryUpdate
 
   return (
     <div className="diary-view">
+      {/* Warning banner for unsaved changes */}
+      {hasUnsavedChanges && (showNewEntryForm || editingEntry) && (
+        <div className="unsaved-warning-banner">
+          <span>⚠️ You have unsaved changes. They will be auto-saved every 10 seconds.</span>
+        </div>
+      )}
+
       <div className="diary-header">
         <button className="back-btn" onClick={handleBackClick}>
           ← Back
