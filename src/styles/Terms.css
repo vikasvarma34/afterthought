@@ -1,19 +1,45 @@
+:root[data-theme='light'] {
+  --dv-bg: #f5f5f0;
+  --dv-bg-card: #fff;
+  --dv-text: #4a4741;
+  --dv-text-muted: #6a6a5f;
+  --dv-border: #e0e0d8;
+  --dv-border-light: #d8d8d0;
+  --dv-input-bg: #fafaf8;
+  --dv-button-bg: #7a6f6a;
+  --dv-button-hover: #8a7f7a;
+  --dv-placeholder: #b8b8b0;
+}
+
+:root[data-theme='dark'] {
+  --dv-bg: #1a1a1a;
+  --dv-bg-card: #2a2a2a;
+  --dv-text: #e8e8e8;
+  --dv-text-muted: #a8a8a8;
+  --dv-border: #3a3a3a;
+  --dv-border-light: #4a4a4a;
+  --dv-input-bg: #333333;
+  --dv-button-bg: #444444;
+  --dv-button-hover: #555555;
+  --dv-placeholder: #888888;
+}
+
 .terms-container {
   padding: 16px;
   max-height: 300px;
   overflow-y: auto;
-  background: #fafaf8;
-  border: 1px solid #e0e0d8;
+  background: var(--dv-input-bg);
+  border: 1px solid var(--dv-border);
   border-radius: 6px;
   font-size: 12px;
   line-height: 1.5;
-  color: #6a6a5f;
+  color: var(--dv-text-muted);
 }
 
 .terms-container h2 {
   font-size: 16px;
   font-weight: 500;
-  color: #4a4741;
+  color: var(--dv-text);
   margin-bottom: 12px;
 }
 
@@ -24,7 +50,7 @@
 .terms-container h3 {
   font-size: 13px;
   font-weight: 500;
-  color: #5a5a52;
+  color: var(--dv-text);
   margin-bottom: 6px;
 }
 

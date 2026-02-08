@@ -1,18 +1,44 @@
+:root[data-theme='light'] {
+  --dv-bg: #f5f5f0;
+  --dv-bg-card: #fff;
+  --dv-text: #4a4741;
+  --dv-text-muted: #6a6a5f;
+  --dv-border: #e0e0d8;
+  --dv-border-light: #d8d8d0;
+  --dv-input-bg: #fafaf8;
+  --dv-button-bg: #7a6f6a;
+  --dv-button-hover: #8a7f7a;
+  --dv-placeholder: #b8b8b0;
+}
+
+:root[data-theme='dark'] {
+  --dv-bg: #1a1a1a;
+  --dv-bg-card: #2a2a2a;
+  --dv-text: #e8e8e8;
+  --dv-text-muted: #a8a8a8;
+  --dv-border: #3a3a3a;
+  --dv-border-light: #4a4a4a;
+  --dv-input-bg: #333333;
+  --dv-button-bg: #444444;
+  --dv-button-hover: #555555;
+  --dv-placeholder: #888888;
+}
+
 .auth-container {
   display: flex;
   align-items: center;
   justify-content: center;
   height: 100vh;
-  background: #1a1814;
+  background: var(--dv-bg);
 }
 
 .auth-card {
   width: 100%;
   max-width: 400px;
   padding: 40px;
-  background: #f5f5f0;
+  background: var(--dv-bg-card);
   border-radius: 8px;
-  border: 1px solid #e0e0d8;
+  border: 1px solid var(--dv-border);
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
 }
 
@@ -36,7 +62,7 @@
   font-family: 'Playfair Display', serif;
   font-size: 32px;
   font-weight: 400;
-  color: #4a4741;
+  color: var(--dv-text);
   letter-spacing: 0.5px;
   margin: 0;
   display: block;
@@ -44,7 +70,7 @@
 
 .auth-logo .app-tagline {
   font-size: 13px;
-  color: #a8a89d;
+  color: var(--dv-text-muted);
   margin: 0;
   letter-spacing: 0.2px;
   font-weight: 400;
@@ -60,15 +86,15 @@
 .auth-card input {
   width: 100%;
   padding: 12px;
-  background: #fff;
-  border: 1px solid #d8d8d0;
-  color: #4a4741;
+  background: var(--dv-input-bg);
+  border: 1px solid var(--dv-border-light);
+  color: var(--dv-text);
   border-radius: 6px;
   font-size: 14px;
 }
 
 .auth-card input::placeholder {
-  color: #b8b8b0;
+  color: var(--dv-placeholder);
 }
 
 /* Password Field with Visibility Toggle */
@@ -129,7 +155,7 @@
 }
 
 .validation-item.invalid {
-  color: #a8a89d;
+  color: var(--dv-text-muted);
 }
 
 .validation-icon {
@@ -142,7 +168,7 @@
 }
 
 .validation-item.invalid .validation-icon {
-  color: #d8d8d0;
+  color: var(--dv-border-light);
 }
 
 /* Error and Success Messages for Password Match */
@@ -161,9 +187,9 @@
 .auth-card button[type='submit'] {
   width: 100%;
   padding: 12px;
-  background: #7a6f6a;
+  background: var(--dv-button-bg);
   border: none;
-  color: #f5f5f0;
+  color: var(--dv-bg);
   border-radius: 6px;
   font-weight: 500;
   cursor: pointer;
@@ -172,7 +198,7 @@
 }
 
 .auth-card button[type='submit']:hover:not(:disabled) {
-  background: #8a7f7a;
+  background: var(--dv-button-hover);
 }
 
 .auth-card button[type='submit']:disabled {
@@ -185,14 +211,14 @@
   padding: 10px;
   background: transparent;
   border: none;
-  color: #a8a89d;
+  color: var(--dv-text-muted);
   font-size: 13px;
   cursor: pointer;
   transition: color 0.2s;
 }
 
 .toggle-btn:hover {
-  color: #8a8a7d;
+  color: var(--dv-text);
   background: transparent;
 }
 
@@ -221,7 +247,7 @@
   align-items: center;
   gap: 8px;
   font-size: 13px;
-  color: #6a6a5f;
+  color: var(--dv-text-muted);
   cursor: pointer;
 }
 
@@ -231,7 +257,7 @@
   cursor: pointer;
   margin: 0;
   padding: 0;
-  accent-color: #7a6f6a;
+  accent-color: var(--dv-button-bg);
 }
 
 /* Mobile Responsive */
@@ -321,7 +347,7 @@
     padding: 24px 16px;
     border: none;
     box-shadow: none;
-    background: #f5f5f0;
+    background: var(--dv-bg-card);
   }
 
   .auth-logo {

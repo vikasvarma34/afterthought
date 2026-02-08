@@ -1,6 +1,7 @@
 import { useEffect, useState, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { supabase } from '../lib/supabase';
+import { useTheme } from '../lib/ThemeContext';
 import DiaryList from '../components/DiaryList';
 import DiaryView from '../components/DiaryView';
 import EmptyState from '../components/EmptyState';
@@ -19,6 +20,7 @@ export default function Home() {
   const [newDiaryTitle, setNewDiaryTitle] = useState('');
   const [creatingDiary, setCreatingDiary] = useState(false);
   const [showSettings, setShowSettings] = useState(false);
+  const { isDark, toggleDarkMode } = useTheme();
   const navigate = useNavigate();
   const inactivityTimeoutRef = useRef(null);
 
@@ -154,6 +156,12 @@ export default function Home() {
                 <div className="settings-user-info">
                   <p className="settings-label">Email</p>
                   <p className="settings-value">{user.email}</p>
+                </div>
+                <div className="settings-theme-toggle">
+                  <p className="settings-label">Dark Mode</p>
+                  <button className="theme-toggle-btn" onClick={toggleDarkMode}>
+                    {isDark ? '🌙 ON' : '☀️ OFF'}
+                  </button>
                 </div>
                 <button className="settings-logout-btn" onClick={handleLogout}>
                   Logout
