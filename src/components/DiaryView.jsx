@@ -419,7 +419,7 @@ export default function DiaryView({ diary, onBack, onDiaryDeleted, onDiaryUpdate
         <div className="modal-overlay" onClick={handleCloseEdit}></div>
         <div className="entry-modal">
           <div className="entry-modal-header">
-            <h2>Edit Entry</h2>
+            <div></div>
             <button className="close-btn" onClick={handleCloseEdit}>×</button>
           </div>
           <form className="entry-form-modal">

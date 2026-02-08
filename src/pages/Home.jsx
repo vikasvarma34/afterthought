@@ -231,8 +231,8 @@ export default function Home() {
           </>
         ) : (
           <Placeholder
-            message="Select a diary to start writing"
-            subMessage="Choose from your diaries on the left"
+            message="Take a moment to settle into yourself."
+            subMessage="Whatever feels closest right now is enough to begin."
           />
         )}
       </div>

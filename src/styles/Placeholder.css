@@ -39,15 +39,16 @@
 }
 
 .placeholder-message {
-  font-size: 18px;
+  font-size: 28px;
   font-weight: 300;
-  color: var(--dv-text-muted);
-  margin-bottom: 12px;
-  letter-spacing: -0.2px;
+  color: var(--dv-text);
+  margin-bottom: 16px;
+  letter-spacing: -0.3px;
+  line-height: 1.4;
 }
 
 .placeholder-submessage {
-  font-size: 14px;
-  color: var(--dv-placeholder);
-  line-height: 1.5;
+  font-size: 18px;
+  color: var(--dv-text-muted);
+  line-height: 1.6;
 }
