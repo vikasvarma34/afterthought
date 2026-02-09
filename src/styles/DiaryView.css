@@ -326,6 +326,7 @@
   display: flex;
   gap: 8px;
   justify-content: flex-end;
+  align-items: center;
 }
 
 .form-actions button {
@@ -366,6 +367,11 @@
   background: var(--dv-input-bg);
   border-color: var(--dv-border-light);
   color: var(--dv-text);
+}
+
+/* Voice input button positioning */
+.form-actions .voice-mic-btn {
+  margin-right: auto;
 }
 
 .entries {
@@ -549,8 +555,8 @@
   }
 
   .entry-form-modal textarea {
-    min-height: 150px;
-    max-height: 300px;
+    min-height: 350px;
+    max-height: 70vh;
   }
 
   .entries {
@@ -647,8 +653,8 @@
   }
 
   .entry-form-modal textarea {
-    min-height: 120px;
-    max-height: 250px;
+    min-height: 320px;
+    max-height: 70vh;
   }
 
   .entries {

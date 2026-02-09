@@ -1,0 +1,232 @@
+.voice-mic-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  border: 1px solid;
+  border-radius: 6px;
+  background: transparent;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  padding: 0;
+  flex-shrink: 0;
+  color: currentColor;
+}
+
+/* Light mode */
+.voice-mic-btn {
+  border-color: #ddd;
+  color: #666;
+}
+
+.voice-mic-btn:hover:not(:disabled) {
+  border-color: #999;
+  background-color: #f5f5f5;
+}
+
+.voice-mic-btn:active:not(:disabled) {
+  background-color: #eee;
+  transform: scale(0.95);
+}
+
+.voice-mic-btn.processing {
+  border-color: #ffa500;
+  background-color: #fff8f0;
+}
+
+.voice-mic-btn.recording {
+  border-color: #ff4444;
+  background-color: #ffe0e0;
+  animation: pulse-btn 0.6s ease-in-out infinite;
+}
+
+.voice-mic-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* Dark mode */
+:root[data-theme='dark'] .voice-mic-btn,
+.dark-mode .voice-mic-btn,
+body.dark-mode .voice-mic-btn {
+  border-color: #555;
+  color: #aaa;
+}
+
+:root[data-theme='dark'] .voice-mic-btn:hover:not(:disabled),
+.dark-mode .voice-mic-btn:hover:not(:disabled),
+body.dark-mode .voice-mic-btn:hover:not(:disabled) {
+  border-color: #888;
+  background-color: #333;
+}
+
+:root[data-theme='dark'] .voice-mic-btn:active:not(:disabled),
+.dark-mode .voice-mic-btn:active:not(:disabled),
+body.dark-mode .voice-mic-btn:active:not(:disabled) {
+  background-color: #444;
+}
+
+:root[data-theme='dark'] .voice-mic-btn.processing,
+.dark-mode .voice-mic-btn.processing,
+body.dark-mode .voice-mic-btn.processing {
+  border-color: #ff8c00;
+  background-color: #332200;
+}
+
+:root[data-theme='dark'] .voice-mic-btn.recording,
+.dark-mode .voice-mic-btn.recording,
+body.dark-mode .voice-mic-btn.recording {
+  border-color: #ff6666;
+  background-color: #662222;
+}
+
+@keyframes pulse-btn {
+  0%, 100% {
+    box-shadow: 0 0 0 0 rgba(255, 68, 68, 0.4);
+  }
+  50% {
+    box-shadow: 0 0 0 6px rgba(255, 68, 68, 0.1);
+  }
+}
+
+.recording-circle {
+  animation: pulse-circle 0.6s ease-in-out infinite;
+  fill: #ff4444;
+}
+
+@keyframes pulse-circle {
+  0%, 100% {
+    r: 9;
+    opacity: 1;
+  }
+  50% {
+    r: 10.5;
+    opacity: 0.7;
+  }
+}
+
+.recording-indicator {
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  padding: 12px 16px;
+  border-radius: 20px;
+  font-size: 13px;
+  font-weight: 500;
+  white-space: nowrap;
+  z-index: 1000;
+  animation: slideInUp 0.3s ease;
+}
+
+/* Light mode indicator */
+.recording-indicator {
+  background-color: #ff4444;
+  color: white;
+}
+
+/* Dark mode indicator */
+:root[data-theme='dark'] .recording-indicator,
+.dark-mode .recording-indicator,
+body.dark-mode .recording-indicator {
+  background-color: #ff6666;
+  color: white;
+}
+
+@keyframes slideInUp {
+  from {
+    transform: translateY(20px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+.voice-error {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  padding: 12px 16px;
+  border-radius: 6px;
+  font-size: 14px;
+  background-color: #ff4444;
+  color: white;
+  z-index: 1000;
+  animation: slideIn 0.3s ease;
+  max-width: 300px;
+}
+
+@keyframes slideIn {
+  from {
+    transform: translateX(100%);
+    opacity: 0;
+  }
+  to {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+
+/* Responsive - Mobile */
+@media (max-width: 768px) {
+  .voice-mic-btn {
+    width: 44px;
+    height: 44px;
+    min-height: 44px;
+    min-width: 44px;
+    border-radius: 8px;
+    touch-action: manipulation;
+    -webkit-user-select: none;
+    user-select: none;
+  }
+
+  .voice-mic-btn svg {
+    width: 20px;
+    height: 20px;
+  }
+
+  .voice-error {
+    top: 12px;
+    right: 12px;
+    left: 12px;
+    max-width: none;
+    font-size: 13px;
+    padding: 10px 14px;
+    border-radius: 8px;
+  }
+
+  .recording-indicator {
+    bottom: 12px;
+    right: 12px;
+    left: 12px;
+    text-align: center;
+    font-size: 12px;
+    padding: 10px 14px;
+    border-radius: 8px;
+  }
+}
+
+/* Extra small screens (< 480px) */
+@media (max-width: 480px) {
+  .voice-mic-btn {
+    width: 48px;
+    height: 48px;
+  }
+
+  .voice-error,
+  .recording-indicator {
+    font-size: 12px;
+    padding: 8px 12px;
+  }
+}
+
+/* Prevent zoom on iOS input focus */
+@media (max-width: 768px) {
+  input,
+  textarea,
+  button {
+    font-size: 16px;
+  }
+}

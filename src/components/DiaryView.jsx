@@ -1,6 +1,7 @@
 import { useEffect, useState, useRef, useCallback } from 'react';
 import { supabase } from '../lib/supabase';
 import Placeholder from './Placeholder';
+import VoiceInput from './VoiceInput';
 import '../styles/DiaryView.css';
 import '../styles/Placeholder.css';
 
@@ -25,10 +26,14 @@ export default function DiaryView({ diary, onBack, onDiaryDeleted, onDiaryUpdate
   // Refs to always have latest values
   const titleRef = useRef('');
   const contentRef = useRef('');
-  
+
   // Refs for edit mode autosave
   const editTitleRef = useRef('');
   const editContentRef = useRef('');
+
+  // Textarea refs for voice input
+  const newEntryTextareaRef = useRef(null);
+  const editEntryTextareaRef = useRef(null);
 
   // Autosave for NEW entries (drafts) - silent, no UI feedback
   const autosaveToDB = useCallback(async () => {
@@ -432,12 +437,18 @@ export default function DiaryView({ diary, onBack, onDiaryDeleted, onDiaryUpdate
               required
             />
             <textarea
+              ref={editEntryTextareaRef}
               placeholder="Entry content"
               value={editContent}
               onChange={(e) => handleEditChange(editTitle, e.target.value)}
               disabled={saving}
             />
             <div className="form-actions">
+              <VoiceInput 
+                textareaRef={editEntryTextareaRef} 
+                disabled={saving}
+                onTranscriptUpdate={(text) => handleEditChange(editTitle, text)}
+              />
               <button 
                 type="button"
                 onClick={handleSaveEntry} 
@@ -538,12 +549,18 @@ export default function DiaryView({ diary, onBack, onDiaryDeleted, onDiaryUpdate
                 required
               />
               <textarea
+                ref={newEntryTextareaRef}
                 placeholder="Write your thoughts..."
                 value={content}
                 onChange={(e) => handleContentChange(title, e.target.value)}
                 disabled={saving}
               />
               <div className="form-actions">
+                <VoiceInput 
+                  textareaRef={newEntryTextareaRef} 
+                  disabled={saving}
+                  onTranscriptUpdate={(text) => handleContentChange(title, text)}
+                />
                 <button type="submit" disabled={!title.trim() || !content.trim()}>
                   Save Entry
                 </button>
