@@ -80,6 +80,8 @@
   cursor: pointer;
   padding: 6px 8px;
   transition: opacity 0.2s;
+  position: relative;
+  z-index: 151;
 }
 
 .settings-btn:hover {
@@ -93,19 +95,19 @@
   right: 0;
   bottom: 0;
   z-index: 100;
+  background: transparent;
 }
 
 .settings-menu {
   position: absolute;
-  top: 100%;
+  top: calc(100% + 8px);
   right: 0;
-  margin-top: 8px;
   background: var(--bg-secondary);
   border: 1px solid var(--border-color);
   border-radius: 6px;
   min-width: 220px;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-  z-index: 101;
+  z-index: 151;
   padding: 12px;
 }
 
@@ -177,6 +179,104 @@
 .settings-logout-btn:hover {
   background: var(--logout-hover-bg);
   color: #d87060;
+}
+
+.settings-todos-btn {
+  width: 100%;
+  padding: 10px 12px;
+  background: var(--button-bg);
+  border: 1px solid var(--border-light);
+  color: var(--text-primary);
+  border-radius: 6px;
+  font-size: 13px;
+  cursor: pointer;
+  transition: all 0.2s;
+  font-weight: 500;
+  margin-top: 8px;
+}
+
+.settings-todos-btn:hover {
+  background: var(--button-hover);
+  border-color: var(--text-primary);
+}
+
+.login-choice-modal {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-color);
+  border-radius: 16px;
+  padding: 32px;
+  z-index: 201;
+  max-width: 400px;
+  width: 90%;
+  text-align: center;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+}
+
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.5);
+  z-index: 200;
+}
+
+.login-choice-modal h2 {
+  margin: 0 0 28px;
+  color: var(--text-primary);
+  font-size: 20px;
+  font-weight: 600;
+  letter-spacing: 0.3px;
+}
+
+.choice-buttons {
+  display: flex;
+  gap: 12px;
+  justify-content: center;
+}
+
+.choice-btn {
+  flex: 1;
+  min-width: 140px;
+  padding: 18px 16px;
+  border: 2px solid var(--border-light);
+  background: var(--bg-primary);
+  color: var(--text-primary);
+  border-radius: 12px;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 600;
+  transition: all 0.3s;
+}
+
+.choice-btn:hover {
+  border-color: var(--text-primary);
+  background: var(--button-bg);
+}
+
+.choice-btn.reflections {
+  background: rgba(120, 150, 200, 0.1);
+  border-color: rgba(120, 150, 200, 0.3);
+}
+
+.choice-btn.reflections:hover {
+  background: rgba(120, 150, 200, 0.2);
+  border-color: rgba(120, 150, 200, 0.5);
+}
+
+.choice-btn.plans {
+  background: rgba(150, 120, 200, 0.1);
+  border-color: rgba(150, 120, 200, 0.3);
+}
+
+.choice-btn.plans:hover {
+  background: rgba(150, 120, 200, 0.2);
+  border-color: rgba(150, 120, 200, 0.5);
 }
 
 .content {
@@ -440,5 +540,27 @@
   .modal-actions button {
     padding: 8px 12px;
     font-size: 12px;
+  }
+
+  .login-choice-modal {
+    width: 90%;
+    padding: 24px 16px;
+  }
+
+  .login-choice-modal h2 {
+    font-size: 18px;
+    margin-bottom: 20px;
+  }
+
+  .choice-buttons {
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .choice-btn {
+    padding: 16px 12px;
+    font-size: 13px;
+    min-width: auto;
+    width: 100%;
   }
 }

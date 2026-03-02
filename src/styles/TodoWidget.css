@@ -1,0 +1,216 @@
+.todo-widget {
+  padding: 16px 0;
+  border-top: 1px solid var(--border-color);
+  margin-top: 16px;
+}
+
+.widget-title {
+  font-size: 13px;
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
+  color: var(--text-secondary);
+  margin: 0 0 12px;
+  font-weight: 600;
+}
+
+.widget-form {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-bottom: 12px;
+}
+
+.widget-input-group {
+  display: flex;
+  gap: 8px;
+}
+
+.widget-input {
+  flex: 1;
+  border: 1px solid var(--border-light);
+  background: var(--input-bg);
+  border-radius: 6px;
+  padding: 8px 10px;
+  font-size: 12px;
+  color: var(--text-primary);
+  font-family: inherit;
+}
+
+.widget-input:focus {
+  outline: none;
+  border-color: var(--button-bg);
+}
+
+.widget-add-btn {
+  padding: 8px 12px;
+  background: var(--button-bg);
+  color: var(--button-text);
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: 600;
+  font-size: 14px;
+  transition: background 0.2s;
+}
+
+.widget-add-btn:hover:not(:disabled) {
+  background: var(--button-hover);
+}
+
+.widget-add-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.widget-meta {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+}
+
+.widget-select,
+.widget-date {
+  border: 1px solid var(--border-light);
+  background: var(--input-bg);
+  border-radius: 6px;
+  padding: 6px 8px;
+  font-size: 11px;
+  color: var(--text-primary);
+  font-family: inherit;
+}
+
+.widget-select:focus,
+.widget-date:focus {
+  outline: none;
+  border-color: var(--button-bg);
+}
+
+.widget-stats {
+  display: flex;
+  gap: 12px;
+  font-size: 11px;
+  color: var(--text-secondary);
+  margin-bottom: 10px;
+}
+
+.widget-filters {
+  display: flex;
+  gap: 6px;
+  margin-bottom: 10px;
+}
+
+.filter-badge {
+  padding: 4px 10px;
+  border: 1px solid var(--border-light);
+  background: transparent;
+  color: var(--text-primary);
+  border-radius: 12px;
+  font-size: 11px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.filter-badge:hover {
+  border-color: var(--button-bg);
+}
+
+.filter-badge.active {
+  background: var(--button-bg);
+  color: var(--button-text);
+  border-color: var(--button-bg);
+}
+
+.widget-list {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  max-height: 250px;
+  overflow-y: auto;
+}
+
+.widget-empty {
+  text-align: center;
+  padding: 16px;
+  color: var(--text-secondary);
+  font-size: 11px;
+  margin: 0;
+}
+
+.widget-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  padding: 8px 10px;
+  border-radius: 6px;
+  background: rgba(0, 0, 0, 0.02);
+  font-size: 12px;
+}
+
+.todo-widget.dark .widget-item {
+  background: rgba(255, 255, 255, 0.04);
+}
+
+.widget-item.done {
+  opacity: 0.6;
+}
+
+.widget-check {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  flex: 1;
+  cursor: pointer;
+}
+
+.widget-check input {
+  width: 14px;
+  height: 14px;
+  cursor: pointer;
+}
+
+.check-text {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  flex: 1;
+}
+
+.widget-item.done .check-text {
+  text-decoration: line-through;
+  color: var(--text-secondary);
+}
+
+.item-importance {
+  font-size: 10px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.2px;
+}
+
+.item-importance.importance-low {
+  color: #7a9e7e;
+}
+
+.item-importance.importance-medium {
+  color: #d4a574;
+}
+
+.item-importance.importance-high {
+  color: #c85a54;
+}
+
+.widget-delete {
+  background: none;
+  border: none;
+  color: var(--text-secondary);
+  font-size: 12px;
+  cursor: pointer;
+  padding: 2px 4px;
+  transition: color 0.2s;
+  flex-shrink: 0;
+}
+
+.widget-delete:hover {
+  color: var(--text-primary);
+}

@@ -1,0 +1,416 @@
+/* Modal Overlay */
+.todo-modal-overlay {
+  position: fixed;
+  inset: 0;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  backdrop-filter: blur(2px);
+  animation: fadeIn 0.2s ease-in-out;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+/* Modal Container */
+.todo-modal {
+  background-color: var(--todo-bg-primary);
+  border-radius: 12px;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+  max-width: 500px;
+  width: 90%;
+  max-height: 90vh;
+  overflow-y: auto;
+  padding: 24px;
+  animation: slideUp 0.3s ease-out;
+  color: var(--todo-text-primary);
+}
+
+@keyframes slideUp {
+  from {
+    transform: translateY(20px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+/* Modal Header */
+.todo-modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 24px;
+  padding-bottom: 16px;
+  border-bottom: 1px solid var(--todo-border);
+}
+
+.todo-modal-header h2 {
+  margin: 0;
+  font-size: 20px;
+  font-weight: 600;
+  color: var(--todo-text-primary);
+}
+
+.todo-modal-close {
+  background: none;
+  border: none;
+  font-size: 24px;
+  cursor: pointer;
+  color: var(--todo-muted);
+  padding: 0;
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 8px;
+  transition: background-color 0.2s;
+}
+
+.todo-modal-close:hover {
+  background-color: var(--todo-bg-secondary);
+  color: var(--todo-text-primary);
+}
+
+/* Task Title */
+.todo-modal-task-title {
+  margin: 0;
+  font-size: 18px;
+  font-weight: 600;
+  color: var(--todo-text-primary);
+  word-break: break-word;
+  line-height: 1.4;
+}
+
+/* Modal Sections */
+.todo-modal-section {
+  margin-bottom: 24px;
+}
+
+.todo-modal-label {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.todo-modal-label-text {
+  font-size: 13px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: var(--todo-muted);
+}
+
+/* Textarea */
+.todo-modal-textarea {
+  width: 100%;
+  padding: 12px;
+  border: 1px solid var(--todo-border);
+  border-radius: 8px;
+  background-color: var(--todo-bg-secondary);
+  color: var(--todo-text-primary);
+  font-family: inherit;
+  font-size: 14px;
+  line-height: 1.5;
+  resize: vertical;
+  min-height: 100px;
+  max-height: 200px;
+  transition: border-color 0.2s, background-color 0.2s;
+}
+
+.todo-modal-textarea:focus {
+  outline: none;
+  border-color: var(--todo-color-medium);
+  background-color: var(--todo-bg-primary);
+}
+
+/* Character Count */
+.todo-modal-char-count {
+  font-size: 12px;
+  color: var(--todo-muted);
+  text-align: right;
+}
+
+/* Select Input */
+.todo-modal-select,
+.todo-modal-input {
+  width: 100%;
+  padding: 10px 12px;
+  border: 1px solid var(--todo-border);
+  border-radius: 8px;
+  background-color: var(--todo-bg-secondary);
+  color: var(--todo-text-primary);
+  font-family: inherit;
+  font-size: 14px;
+  transition: border-color 0.2s, background-color 0.2s;
+}
+
+.todo-modal-select:focus,
+.todo-modal-input:focus {
+  outline: none;
+  border-color: var(--todo-color-medium);
+  background-color: var(--todo-bg-primary);
+}
+
+/* Date Wrapper */
+.todo-date-wrapper {
+  display: flex;
+  gap: 8px;
+  align-items: flex-start;
+}
+
+.todo-modal-input {
+  flex: 1;
+  min-width: 0;
+}
+
+.todo-date-preset-btn {
+  padding: 10px 12px;
+  background-color: var(--todo-bg-secondary);
+  border: 1px solid var(--todo-border);
+  border-radius: 8px;
+  color: var(--todo-text-primary);
+  cursor: pointer;
+  font-size: 13px;
+  white-space: nowrap;
+  transition: all 0.2s;
+  flex-shrink: 0;
+}
+
+.todo-date-preset-btn:hover {
+  background-color: var(--todo-color-medium-bg);
+  border-color: var(--todo-color-medium);
+}
+
+.todo-date-preset-btn:active {
+  transform: scale(0.98);
+}
+
+/* Date Options Menu */
+.todo-date-options {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+  margin-top: 12px;
+  padding: 12px;
+  background-color: var(--todo-bg-secondary);
+  border-radius: 8px;
+  border: 1px solid var(--todo-border);
+}
+
+.todo-date-option {
+  padding: 10px;
+  background-color: var(--todo-bg-primary);
+  border: 1px solid var(--todo-border);
+  border-radius: 6px;
+  color: var(--todo-text-primary);
+  cursor: pointer;
+  font-size: 13px;
+  font-weight: 500;
+  transition: all 0.2s;
+  text-align: center;
+}
+
+.todo-date-option:hover {
+  background-color: var(--todo-color-medium-bg);
+  border-color: var(--todo-color-medium);
+  color: var(--todo-text-primary);
+}
+
+.todo-date-option:active {
+  transform: scale(0.95);
+}
+
+.todo-date-option-clear {
+  grid-column: 1 / -1;
+  opacity: 0.7;
+}
+
+.todo-date-option-clear:hover {
+  opacity: 1;
+  border-color: var(--todo-color-high);
+  background-color: var(--todo-color-high-bg);
+}
+
+/* Current Date Display */
+.todo-current-date {
+  margin-top: 8px;
+  padding: 8px 12px;
+  background-color: var(--todo-color-medium-bg);
+  border-radius: 6px;
+  font-size: 13px;
+  color: var(--todo-text-primary);
+  border-left: 3px solid var(--todo-color-medium);
+}
+
+/* Action Buttons */
+.todo-modal-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-bottom: 24px;
+  padding-top: 24px;
+  border-top: 1px solid var(--todo-border);
+}
+
+.todo-modal-btn {
+  padding: 12px 16px;
+  border: none;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+  white-space: nowrap;
+  text-align: center;
+}
+
+.todo-modal-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.todo-modal-btn:active:not(:disabled) {
+  transform: scale(0.98);
+}
+
+/* Complete Button - Primary action */
+.todo-modal-btn-complete {
+  background-color: var(--todo-color-low);
+  color: white;
+  order: 2;
+}
+
+.todo-modal-btn-complete:hover:not(:disabled) {
+  opacity: 0.9;
+  box-shadow: 0 4px 12px rgba(122, 158, 126, 0.3);
+}
+
+/* Save Button - Secondary action */
+.todo-modal-btn-save {
+  background-color: var(--todo-color-medium-bg);
+  color: var(--todo-color-medium);
+  border: 2px solid var(--todo-color-medium);
+  order: 1;
+}
+
+.todo-modal-btn-save:hover:not(:disabled) {
+  background-color: var(--todo-color-medium);
+  color: white;
+  box-shadow: 0 4px 12px rgba(212, 165, 116, 0.3);
+}
+
+/* Delete Button - Destructive action */
+.todo-modal-btn-delete {
+  background-color: var(--todo-color-high-bg);
+  color: var(--todo-color-high);
+  order: 3;
+  border: 1px solid var(--todo-color-high);
+}
+
+.todo-modal-btn-delete:hover:not(:disabled) {
+  background-color: var(--todo-color-high);
+  color: white;
+  box-shadow: 0 4px 12px rgba(200, 90, 84, 0.3);
+}
+
+/* Modal Footer */
+.todo-modal-footer {
+  text-align: center;
+  padding-top: 16px;
+  border-top: 1px solid var(--todo-border);
+}
+
+.todo-modal-footer-text {
+  margin: 0;
+  font-size: 12px;
+  color: var(--todo-muted);
+}
+
+.todo-modal-footer-text kbd {
+  background-color: var(--todo-bg-secondary);
+  border: 1px solid var(--todo-border);
+  border-radius: 4px;
+  padding: 2px 6px;
+  font-family: monospace;
+  font-size: 11px;
+  color: var(--todo-text-primary);
+}
+
+/* Mobile Responsiveness */
+@media (max-width: 768px) {
+  .todo-modal {
+    width: 95%;
+    max-height: 85vh;
+    padding: 20px;
+  }
+
+  .todo-modal-header {
+    margin-bottom: 20px;
+    padding-bottom: 12px;
+  }
+
+  .todo-date-options {
+    grid-template-columns: 1fr;
+  }
+
+  .todo-date-option-clear {
+    grid-column: 1;
+  }
+
+  .todo-modal-actions {
+    flex-direction: column;
+  }
+
+  .todo-modal-btn {
+    padding: 14px;
+    font-size: 15px;
+  }
+}
+
+@media (max-width: 480px) {
+  .todo-modal {
+    width: 100%;
+    max-height: 90vh;
+    padding: 16px;
+    border-radius: 8px;
+  }
+
+  .todo-modal-task-title {
+    font-size: 16px;
+  }
+
+  .todo-date-wrapper {
+    flex-direction: column;
+  }
+
+  .todo-date-preset-btn {
+    width: 100%;
+  }
+
+  .todo-modal-textarea {
+    min-height: 80px;
+  }
+}
+
+/* Dark mode specific adjustments */
+@media (prefers-color-scheme: dark) {
+  .todo-modal-overlay {
+    background-color: rgba(0, 0, 0, 0.7);
+  }
+
+  .todo-modal {
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.7);
+  }
+}

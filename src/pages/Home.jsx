@@ -1,4 +1,4 @@
-import { useEffect, useState, useRef } from 'react';
+import { useEffect, useState, useRef, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { supabase } from '../lib/supabase';
 import { useTheme } from '../lib/ThemeContext';
@@ -6,6 +6,7 @@ import DiaryList from '../components/DiaryList';
 import DiaryView from '../components/DiaryView';
 import EmptyState from '../components/EmptyState';
 import Placeholder from '../components/Placeholder';
+import TodoPanel from '../components/TodoPanel';
 import logo from '../assets/—Pngtree—black quill feather pen with_5157648.png';
 import '../styles/Home.css';
 import '../styles/EmptyState.css';
@@ -15,39 +16,16 @@ export default function Home() {
   const [user, setUser] = useState(null);
   const [diaries, setDiaries] = useState([]);
   const [selectedDiary, setSelectedDiary] = useState(null);
+  const [showTodoList, setShowTodoList] = useState(false);
   const [loading, setLoading] = useState(true);
   const [showCreateDiaryModal, setShowCreateDiaryModal] = useState(false);
   const [newDiaryTitle, setNewDiaryTitle] = useState('');
   const [creatingDiary, setCreatingDiary] = useState(false);
   const [showSettings, setShowSettings] = useState(false);
+  const [showLoginChoice, setShowLoginChoice] = useState(false);
   const { isDark, toggleDarkMode } = useTheme();
   const navigate = useNavigate();
   const inactivityTimeoutRef = useRef(null);
-
-  useEffect(() => {
-    const checkAuth = async () => {
-      const {
-        data: { session },
-      } = await supabase.auth.getSession();
-      if (!session) {
-        navigate('/login');
-        return;
-      }
-      setUser(session.user);
-      fetchDiaries(session.user.id);
-    };
-    checkAuth();
-
-    const {
-      data: { subscription },
-    } = supabase.auth.onAuthStateChange((event, session) => {
-      if (!session) {
-        navigate('/login');
-      }
-    });
-
-    return () => subscription?.unsubscribe();
-  }, [navigate]);
 
   const fetchDiaries = async (userId) => {
     setLoading(true);
@@ -66,26 +44,56 @@ export default function Home() {
     setLoading(false);
   };
 
-  const handleLogout = async () => {
+  useEffect(() => {
+    const checkAuth = async () => {
+      const {
+        data: { session },
+      } = await supabase.auth.getSession();
+      if (!session) {
+        navigate('/login');
+        return;
+      }
+      setUser(session.user);
+      setShowLoginChoice(true);
+      fetchDiaries(session.user.id);
+    };
+    checkAuth();
+
+    const {
+      data: { subscription },
+    } = supabase.auth.onAuthStateChange((event, session) => {
+      if (session) {
+        setUser(session.user);
+        setShowLoginChoice(true);
+        fetchDiaries(session.user.id);
+      } else {
+        navigate('/login');
+      }
+    });
+
+    return () => subscription?.unsubscribe();
+  }, [navigate]);
+
+  const handleLogout = useCallback(async () => {
     if (inactivityTimeoutRef.current) {
       clearTimeout(inactivityTimeoutRef.current);
     }
     await supabase.auth.signOut();
     navigate('/login');
-  };
-
-  const resetInactivityTimer = () => {
-    if (inactivityTimeoutRef.current) {
-      clearTimeout(inactivityTimeoutRef.current);
-    }
-
-    inactivityTimeoutRef.current = setTimeout(() => {
-      console.log('User inactive for 30 minutes. Logging out...');
-      handleLogout();
-    }, 30 * 60 * 1000); // 30 minutes
-  };
+  }, [navigate]);
 
   useEffect(() => {
+    const resetInactivityTimer = () => {
+      if (inactivityTimeoutRef.current) {
+        clearTimeout(inactivityTimeoutRef.current);
+      }
+
+      inactivityTimeoutRef.current = setTimeout(() => {
+        console.log('User inactive for 30 minutes. Logging out...');
+        handleLogout();
+      }, 30 * 60 * 1000); // 30 minutes
+    };
+
     resetInactivityTimer();
 
     const events = ['mousedown', 'keydown', 'scroll', 'touchstart', 'click'];
@@ -99,7 +107,7 @@ export default function Home() {
         clearTimeout(inactivityTimeoutRef.current);
       }
     };
-  }, []);
+  }, [handleLogout]);
 
   const handleCreateDiary = async (title) => {
     const { data, error } = await supabase
@@ -134,6 +142,29 @@ export default function Home() {
 
   return (
     <div className="home">
+      {showLoginChoice && (
+        <>
+          <div className="modal-overlay"></div>
+          <div className="login-choice-modal">
+            <h2>Welcome! What would you like to do?</h2>
+            <div className="choice-buttons">
+              <button className="choice-btn reflections" onClick={() => {
+                setShowLoginChoice(false);
+                setShowTodoList(false);
+              }}>
+                Reflections
+              </button>
+              <button className="choice-btn plans" onClick={() => {
+                setShowLoginChoice(false);
+                setShowTodoList(true);
+              }}>
+                Plans
+              </button>
+            </div>
+          </div>
+        </>
+      )}
+
       <div className="header">
         <h1 className="header-title">
           <img src={logo} alt="afterThoughts" />
@@ -172,15 +203,23 @@ export default function Home() {
         </div>
       </div>
 
-      <div className="content">
-        <div className="diary-list-container">
+      <div className="content" style={{ display: showLoginChoice ? 'none' : 'flex' }}>
+        <div className="diary-list-container" style={{ display: showTodoList ? 'none' : 'block' }}>
           <DiaryList
             diaries={diaries}
             onSelectDiary={setSelectedDiary}
             onCreateDiary={handleCreateDiary}
+            onBack={() => setShowLoginChoice(true)}
           />
         </div>
-        {selectedDiary ? (
+        {showTodoList ? (
+          <div className="diary-view-container">
+            <TodoPanel userId={user?.id} onBack={() => {
+              setShowTodoList(false);
+              setShowLoginChoice(true);
+            }} />
+          </div>
+        ) : selectedDiary ? (
           <div className="diary-view-container">
             <DiaryView
               diary={selectedDiary}

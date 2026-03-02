@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import '../styles/DiaryList.css';
 
-export default function DiaryList({ diaries, onSelectDiary, onCreateDiary }) {
+export default function DiaryList({ diaries, onSelectDiary, onCreateDiary, onBack }) {
   const [title, setTitle] = useState('');
   const [creating, setCreating] = useState(false);
 
@@ -17,6 +17,11 @@ export default function DiaryList({ diaries, onSelectDiary, onCreateDiary }) {
 
   return (
     <div className="diary-list">
+      {onBack && (
+        <div className="diary-list-header">
+          <button className="back-to-choice-btn" onClick={onBack}>← Back</button>
+        </div>
+      )}
       <form onSubmit={handleCreate} className="create-form">
         <input
           type="text"
